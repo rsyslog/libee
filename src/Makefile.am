@@ -13,7 +13,7 @@ PTHREADS_CFLAGS = -pthread
 lib_LTLIBRARIES = libee.la
 
 libee_la_SOURCES = \
-	ctx.c
+	ctx.c \
 
 libee_la_CPPFLAGS = $(PTHREADS_CFLAGS)
 libee_la_LIBADD = $(rt_libs)
