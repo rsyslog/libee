@@ -1,6 +1,6 @@
 /**
  * @mainpage
- * Libee - a CEE-based event expression library.
+ * Libee - An Event Expression Library inspired by CEE
  * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
  *
  * In essence, it provides a small but hopefully convenient API
@@ -71,5 +71,15 @@
 #ifndef LIBEE_H_INCLUDED
 #define	LIBEE_H_INCLUDED
 #include <stdlib.h>	/* we need size_t */
+#include "obj.h"
+#include "ctx.h"
+#include "timestamp.h"
+#include "value.h"
+#include "field.h"
+#include "primitivetype.h"
 
+/* some private error codes (always negative)
+ */
+#define E_ERR -1
+#define E_NOMEM -2
 #endif /* #ifndef EE_H_INCLUDED */

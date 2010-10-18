@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file obj.h
+ * @brief A base object containing some common plumbing
+ * @class ee_obj obj.h
  *
  *//*
  *
@@ -26,39 +26,42 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_OBJ_H_INCLUDED
+#define	LIBEE_OBJ_H_INCLUDED
+#include "timestamp.h"
 
 /**
- * The tag class.
- * @extends ee_obj
+ * A base object. It contains the common plumbing which is present in
+ * almost all other EE objects.
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
+struct ee_obj {
+	unsigned objID;
+		/**< a magic number to prevent some memory adressing errors */
+	char *name;
+	char *shortName;
+	char *descr;
+	struct ee_timestamp updated;
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_obj object.
  *
- * @memberof ee_tag
+ * @memberof ee_obj
  * @public
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(void);
+struct ee_obj* ee_newObj(void);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_obj object.
  *
- * @memberof ee_tag
+ * @memberof ee_obj
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param obj The obj to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteObj(struct ee_obj *obj);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_OBJ_H_INCLUDED */

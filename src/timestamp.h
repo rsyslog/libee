@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file timestamp.h
+ * @brief A CEE timestamp
+ * @class ee_timestamp timestamp.h
  *
  *//*
  *
@@ -26,39 +26,18 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_TIMESTAMP_H_INCLUDED
+#define	LIBEE_TIMESTAMP_H_INCLUDED
 
 /**
- * The tag class.
- * @extends ee_obj
+ * An object to represent a CEE/XML timestamp.
+ * 
+ * TODO: maybe replace with something from libxml, as it is
+ * a xs:date type of stamp.
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
+struct ee_timestamp {
+	time_t stamp;
 };
 
-/**
- * Constructor for the ee_tag object.
- *
- * @memberof ee_tag
- * @public
- *
- * @return new library context or NULL if an error occured
- */
-struct ee_tag* ee_newTag(void);
 
-/**
- * Destructor for the ee_tag object.
- *
- * @memberof ee_tag
- * @public
- *
- * @param tag The tag to be discarded.
- */
-void ee_deleteTag(struct ee_tag *tag);
-
-
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_TIMESTAMP_H_INCLUDED */

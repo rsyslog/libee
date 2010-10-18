@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file namelist.h
+ * @brief An object to represent list of names.
+ * @class ee_namelist namelist.h
  *
  *//*
  *
@@ -26,39 +26,42 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_NAMELIST_H_INCLUDED
+#define	LIBEE_NAMELIST_H_INCLUDED
 
 /**
- * The tag class.
+ * An object to represent list of names.
+ *
  * @extends ee_obj
+ *
+ * This is NOT a core CEE object, but rather a libee helper entity.
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
+struct ee_namelist {
+	unsigned objID;
+		/**< a magic number to prevent some memory adressing errors */
+	char *name;
+	struct ee_namelist *next;
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_namelist object.
  *
- * @memberof ee_tag
+ * @memberof ee_namelist
  * @public
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(void);
+struct ee_namelist* ee_newNamelist(void);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_namelist object.
  *
- * @memberof ee_tag
+ * @memberof ee_namelist
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param namelist The namelist to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteNamelist(struct ee_namelist *namelist);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_NAMELIST_H_INCLUDED */

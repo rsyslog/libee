@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file tagset.h
+ * @brief The CEE tagset object.
+ * @class ee_tagset tagset.h
  *
  *//*
  *
@@ -26,39 +26,39 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_TAGSET_H_INCLUDED
+#define	LIBEE_TAGSET_H_INCLUDED
 
 /**
- * The tag class.
+ * The actual tagset object data structure.
+ * 
  * @extends ee_obj
+ *
+ * TODO: is it correct that there is no short name in the CEE spec?
  */
-struct ee_tag {
+struct ee_tagset {
 	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_tagset object.
  *
- * @memberof ee_tag
+ * @memberof ee_tagset
  * @public
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(void);
+struct ee_tagset* ee_newTagset(void);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_tagset object.
  *
- * @memberof ee_tag
+ * @memberof ee_tagset
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param tagset The tagset to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteTagset(struct ee_tagset *tagset);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_TAGSET_H_INCLUDED */

@@ -8,7 +8,7 @@
  * in which all other ee library objects operate.
  *//*
  *
- * Libee - a CEE-based event expression library.
+ * Libee - An Event Expression Library inspired by CEE
  * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.

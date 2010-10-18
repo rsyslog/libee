@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file fieldset.h
+ * @brief The CEE FieldSet Object.
+ * @class ee_fieldset fieldset.h
  *
  *//*
  *
@@ -26,39 +26,36 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_FIELDSET_H_INCLUDED
+#define	LIBEE_FIELDSET_H_INCLUDED
 
 /**
- * The tag class.
+ * The CEE FieldSet Object.
  * @extends ee_obj
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
+struct ee_fieldset {
+	struct ee_obj o;	/*<< @protected base object */
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_fieldset object.
  *
- * @memberof ee_tag
+ * @memberof ee_fieldset
  * @public
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(void);
+struct ee_fieldset* ee_newFieldset(void);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_fieldset object.
  *
- * @memberof ee_tag
+ * @memberof ee_fieldset
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param fieldset The fieldset to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteFieldset(struct ee_fieldset *fieldset);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_FIELDSET_H_INCLUDED */

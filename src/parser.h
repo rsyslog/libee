@@ -1,7 +1,9 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file parser.h
+ * @brief Parser interface (for primitive types).
+ * @class ee_parser parser.h
+ * All parsers obey to this interface. In essence, it specifies the calling
+ * conventions that must be met.
  *
  *//*
  *
@@ -26,39 +28,6 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
-
-/**
- * The tag class.
- * @extends ee_obj
- */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
-};
-
-/**
- * Constructor for the ee_tag object.
- *
- * @memberof ee_tag
- * @public
- *
- * @return new library context or NULL if an error occured
- */
-struct ee_tag* ee_newTag(void);
-
-/**
- * Destructor for the ee_tag object.
- *
- * @memberof ee_tag
- * @public
- *
- * @param tag The tag to be discarded.
- */
-void ee_deleteTag(struct ee_tag *tag);
-
-
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#ifndef LIBEE_PARSER_H_INCLUDED
+#define	LIBEE_PARSER_H_INCLUDED
+#endif /* #ifndef LIBEE_PARSER_H_INCLUDED */

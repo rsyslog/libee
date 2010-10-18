@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file primitivetype.h
+ * @brief Primitive data types.
+ * @class ee_primitiveType primitivetype.h
  *
  *//*
  *
@@ -26,39 +26,45 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED
+#define	LIBEE_PRIMITIVETYPE_H_INCLUDED
 
 /**
- * The tag class.
+ * Representation of a primitive data type.
+ *
  * @extends ee_obj
+ *
+ * A primitive data type is also called a "base type" in CEE. It is at the root
+ * of all type hierarchie. Note that libee primitives include types which do
+ * not seem to be very primitive from a generic programming language type of
+ * view. For us, primitives are those that are very frequently used on logs.
+ * We also try to avoid regexes, as these can be very time-consuming. So we
+ * have things like IPv4Address or FQDN names as primitive types.
  */
-struct ee_tag {
+struct ee_primitiveType {
 	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
+	int (*parse)(ee_ctx ctx, char *p, struct ee_field* newField);
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_primitiveType object.
  *
- * @memberof ee_tag
+ * @memberof ee_primitiveType
  * @public
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(void);
+struct ee_primitiveType* ee_newPrimitiveType(void);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_primitiveType object.
  *
- * @memberof ee_tag
+ * @memberof ee_primitiveType
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param primitiveType The primitiveType to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED */

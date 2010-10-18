@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file valuetype.h
+ * @brief The CEE valueType object.
+ * @class ee_valueType valuetype.h
  *
  *//*
  *
@@ -26,39 +26,37 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_VALUETYPE_H_INCLUDED
+#define	LIBEE_VALUETYPE_H_INCLUDED
 
 /**
- * The tag class.
+ * The CEE ValueType object.
  * @extends ee_obj
  */
-struct ee_tag {
+struct ee_valueType {
 	struct ee_obj o;	/*<< the base object */
-	struct ee_namelist *altNames;
-	struct ee_tagSet *tagset;
-	// TODO: add Tag Relation Element
+	// TODO: restrictions and base types
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_valueType object.
  *
- * @memberof ee_tag
+ * @memberof ee_valueType
  * @public
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(void);
+struct ee_valueType* ee_newValueType(void);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_valueType object.
  *
- * @memberof ee_tag
+ * @memberof ee_valueType
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param valueType The valueType to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteValueType(struct ee_valueType *valueType);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_VALUETYPE_H_INCLUDED */
