@@ -28,8 +28,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
-#include "libee.h"
-#include "nvfield.h"
+#include "libee/libee.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 

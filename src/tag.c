@@ -28,8 +28,8 @@
 #include <stdarg.h>
 #include <assert.h>
 
-#include "libee.h"
-#include "tag.h"
+#include "libee/libee.h"
+#include "libee/tag.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 

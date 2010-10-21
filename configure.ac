@@ -103,6 +103,8 @@ fi
 AC_CONFIG_FILES([Makefile \
 		ee.pc \
 		src/Makefile \
+		include/Makefile \
+		include/libee/Makefile \
 		tests/Makefile])
 AC_OUTPUT
 AC_CONFIG_MACRO_DIR([m4])

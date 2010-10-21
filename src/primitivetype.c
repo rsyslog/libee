@@ -30,7 +30,7 @@
 #include <assert.h>
 #include <ctype.h>
 
-#include "libee.h"
+#include "libee/libee.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 

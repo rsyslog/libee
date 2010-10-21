@@ -1,6 +1,7 @@
 # Uncomment for debugging
 DEBUG = -g
 PTHREADS_CFLAGS = -pthread
+LIBEE_CFLAGS=-I$(top_srcdir)/include
 
 #CFLAGS += $(DEBUG)
 
@@ -20,11 +21,8 @@ libee_la_SOURCES = \
 	fieldbucket.c \
 	primitivetype.c
 
-libee_la_CPPFLAGS = $(LIBXML2_CFLAGS)
+libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS)
 libee_la_LDFLAGS = -version-info 0:0:0
 
-include_HEADERS = \
-	libee.h \
-	ctx.h \
-	primitivetype.h
+include_HEADERS = 

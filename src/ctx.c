@@ -24,8 +24,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "libee.h"
-#include "ctx.h"
+#include "libee/libee.h"
+#include "libee/ctx.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 

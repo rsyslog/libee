@@ -153,15 +153,15 @@
 #ifndef LIBEE_H_INCLUDED
 #define	LIBEE_H_INCLUDED
 #include <stdlib.h>	/* we need size_t */
-#include "obj.h"
-#include "ctx.h"
-#include "timestamp.h"
-#include "value.h"
-#include "field.h"
-#include "nvfield.h"
-#include "fieldbucket.h"
-#include "primitivetype.h"
-#include "tagbucket.h"
+#include "libee/obj.h"
+#include "libee/ctx.h"
+#include "libee/timestamp.h"
+#include "libee/value.h"
+#include "libee/field.h"
+#include "libee/nvfield.h"
+#include "libee/fieldbucket.h"
+#include "libee/primitivetype.h"
+#include "libee/tagbucket.h"
 
 /* some private error codes (always negative)
  */
