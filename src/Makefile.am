@@ -14,10 +14,14 @@ lib_LTLIBRARIES = libee.la
 
 libee_la_SOURCES = \
 	ctx.c \
+	tag.c \
+	tagbucket.c \
+	nvfield.c \
+	fieldbucket.c \
 	primitivetype.c
 
-libee_la_CPPFLAGS = $(PTHREADS_CFLAGS)
-libee_la_LIBADD = $(rt_libs)
+libee_la_CPPFLAGS = $(LIBXML2_CFLAGS)
+libee_la_LIBADD = $(LIBXML2_LIBS)
 libee_la_LDFLAGS = -version-info 0:0:0
 
 include_HEADERS = \

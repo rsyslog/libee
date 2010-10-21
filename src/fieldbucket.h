@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file fieldbucket.h
+ * @brief the fieldbucket object
+ * @class ee_fieldbucket fieldbucket.h
  *
  *//*
  *
@@ -26,41 +26,44 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_FIELDBUCKET_H_INCLUDED
+#define	LIBEE_FIELDBUCKET_H_INCLUDED
+
+#include <libxml/hash.h>
 
 /**
- * The tag class.
- * @extends ee_obj
+ * The fieldbucket object, a container to store fields and their values.
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	/*struct ee_namelist *altNames;*/
-	struct ee_tagSet *tagset;
-	/* TODO?: add Tag Relation Element -- but first wait how CEE evolves */
+struct ee_fieldbucket {
+	unsigned objID;
+		/**< a magic number to prevent some memory adressing errors */
+	ee_ctx ctx;		/**< associated library context */
+	xmlHashTablePtr ht;	/**< this *is* the actual bucket ;) */
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_fieldbucket object.
  *
- * @memberof ee_tag
+ * @memberof ee_fieldbucket
  * @public
  *
- * @param[in] ctx associated library context
+ * @param[in] ctx the library context to use
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(ee_ctx ctx);
+struct ee_fieldbucket* ee_newFieldbucket(ee_ctx ctx);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_fieldbucket object.
  *
- * @memberof ee_tag
+ * @memberof ee_fieldbucket
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param[in] fieldbucket the fieldbucket to destroy
+ *
+ * @param fieldbucket The fieldbucket to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_FIELDBUCKET_H_INCLUDED */

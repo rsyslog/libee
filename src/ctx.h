@@ -31,16 +31,43 @@
  */
 #ifndef LIBEE_EE_H_INCLUDED
 #define	LIBEE_EE_H_INCLUDED
-//#include <stdlib.h>	/* we need size_t */
 
-#define ObjID_None 0xFDFD0001
-#define ObjID_CTX 0xFDFD0001
+/* some configuration-defined values (TODO: autoconf!)
+ */
+#define EE_DFLT_TAG_BCKT_SIZE	5
+	/**< default size for tag buckets (extensible) */
+#define EE_DFLT_FIELD_BCKT_SIZE	11
+	/**< default size for field buckets (extensible) */
+
+#define ObjID_None		0xFDFD0000
+#define ObjID_CTX		0xFDFD0001
+#define ObjID_TAG		0xFDFD0002
+#define ObjID_TAGBUCKET		0xFDFD0003
+#define ObjID_FIELD		0xFDFD0004
+#define ObjID_NVFIELD		0xFDFD0005
+#define ObjID_FIELDBUCKET	0xFDFD0006
+#define ObjID_DELETED		0xFDFDFFFF
+
+/**
+ * The compliance level in which this context runs.
+ * Most importantly, the compliance level defines how picky the
+ * lib is about verifying semantical correctness of the objects
+ * in question.
+ */
+enum ee_compLevel {
+	ee_cl_NONE = 0,	/**< everything is allowed */
+	ee_cl_FULL	/**< full verification is required */
+};
+
 
 struct ee_ctx_s {
 	unsigned objID;	/**< a magic number to prevent some memory adressing errors */
 	void (*dbgCB)(void *cookie, char *msg, size_t lenMsg);
-		/**< user-provided debug output callback */
-	void *dbgCookie; /**< cookie to be passed to debug callback */
+					/**< user-provided debug output callback */
+	void *dbgCookie;		/**< cookie to be passed to debug callback */
+	enum ee_compLevel compLevel;	/**< our compliance level */
+	int fieldBucketSize;		/**< default size for field buckets */
+	int tagBucketSize;		/**< default size for field buckets */
 };
 
 

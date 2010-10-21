@@ -51,6 +51,8 @@ ee_initCtx(void)
 
 	ctx->objID = ObjID_CTX;
 	ctx->dbgCB = NULL;
+	ctx->tagBucketSize = EE_DFLT_TAG_BCKT_SIZE;
+	ctx->fieldBucketSize = EE_DFLT_FIELD_BCKT_SIZE;
 done:
 	return ctx;
 }

@@ -1,11 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
- *
- *//*
- *
- * Libee - An Event Expression Library inspired by CEE
+ * @file nvfield.c
+ * Implements nvfield object methods.
+ *//* Libee - An Event Expression Library inspired by CEE
  * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
@@ -26,41 +22,42 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#include "config.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <assert.h>
 
-/**
- * The tag class.
- * @extends ee_obj
- */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	/*struct ee_namelist *altNames;*/
-	struct ee_tagSet *tagset;
-	/* TODO?: add Tag Relation Element -- but first wait how CEE evolves */
-};
+#include "libee.h"
+#include "nvfield.h"
 
-/**
- * Constructor for the ee_tag object.
- *
- * @memberof ee_tag
- * @public
- *
- * @param[in] ctx associated library context
- *
- * @return new library context or NULL if an error occured
- */
-struct ee_tag* ee_newTag(ee_ctx ctx);
+#define ERR_ABORT {r = 1; goto done; }
 
-/**
- * Destructor for the ee_tag object.
- *
- * @memberof ee_tag
- * @public
- *
- * @param tag The tag to be discarded.
- */
-void ee_deleteTag(struct ee_tag *tag);
+#define CHECK_FIELD \
+	if(nvfield->objID != ObjID_NVFIELD) { \
+		r = -1; \
+		goto done; \
+	}
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+struct ee_nvfield*
+ee_newNVField(ee_ctx __attribute__((unused)) ctx)
+{
+	struct ee_nvfield *nvfield;
+	if((nvfield = malloc(sizeof(struct ee_nvfield))) == NULL)
+		goto done;
+
+	nvfield->objID = ObjID_NVFIELD;
+	nvfield->ctx = ctx;
+
+done:
+	return nvfield;
+}
+
+
+void
+ee_deleteNVField(struct ee_nvfield *nvfield)
+{
+	assert(nvfield->objID == ObjID_NVFIELD);
+	free(nvfield);
+}

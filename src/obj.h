@@ -28,6 +28,8 @@
  */
 #ifndef LIBEE_OBJ_H_INCLUDED
 #define	LIBEE_OBJ_H_INCLUDED
+#include <string.h> 	/* needed for memset() */
+#include "ctx.h"
 #include "timestamp.h"
 
 /**
@@ -37,6 +39,7 @@
 struct ee_obj {
 	unsigned objID;
 		/**< a magic number to prevent some memory adressing errors */
+	ee_ctx ctx;	/**< the library context */
 	char *name;
 	char *shortName;
 	char *descr;
@@ -44,24 +47,48 @@ struct ee_obj {
 };
 
 /**
- * Constructor for the ee_obj object.
+ * Initializer for the ee_obj object.
+ * This is much like the typical constructor, but it does not malloc() the object.
+ * Rather it assumes the object must already exist. This is always the case, as the
+ * ee_obj struct (and NOT a pointer) MUST be the first data element of any
+ * derived object. Not malloc'ing it obviously safes us a lot of overhead
+ * (also think about cache locality).
  *
  * @memberof ee_obj
  * @public
  *
- * @return new library context or NULL if an error occured
+ * @param[in] ctx associated library context
+ * @param[in] pThis pointer to uninitialized ee_obj
  */
-struct ee_obj* ee_newObj(void);
+/* for now, we use an inline function (as it is only called from within
+ * the library, but this may change depending on needs.
+ */
+static inline void
+ee_initObj(ee_ctx ctx, struct ee_obj* pThis)
+{
+	memset(pThis, 0, sizeof(struct ee_obj));
+	pThis->ctx = ctx;
+}
+
 
 /**
- * Destructor for the ee_obj object.
+ * De-Initializer for the ee_obj object.
+ * "Destructs" the object, but does not free any memory (this
+ * is dual to ee_initObj().
  *
  * @memberof ee_obj
  * @public
  *
  * @param obj The obj to be discarded.
  */
-void ee_deleteObj(struct ee_obj *obj);
+/* for now, we use an inline function (as it is only called from within
+ * the library, but this may change depending on needs.
+ */
+static inline void
+ee_deinitObj(struct ee_obj __attribute__((unused)) *pThis)
+{
+	/* currently nothing to do */;
+}
 
 
 #endif /* #ifndef LIBEE_OBJ_H_INCLUDED */

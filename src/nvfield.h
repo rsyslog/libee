@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file nvfield.h
+ * @brief The CEE nvfield object.
+ * @class ee_nvfield nvfield.h
  *
  *//*
  *
@@ -26,41 +26,48 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_NVFIELD_H_INCLUDED
+#define	LIBEE_NVFIELD_H_INCLUDED
 
 /**
- * The tag class.
- * @extends ee_obj
+ * The NVField object.
+ *
+ * This represents a name-value pair, whereby the name should correspond
+ * to a valid field type. However, depending on compliance level, name
+ * may not point to a valid field. For this reason, we do not require
+ * a pointer to the proper field definition.
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	/*struct ee_namelist *altNames;*/
-	struct ee_tagSet *tagset;
-	/* TODO?: add Tag Relation Element -- but first wait how CEE evolves */
+struct ee_nvfield {
+	int objID;		/**< magic number to identify the object */
+	ee_ctx ctx;		/**< associated library context */
+	char	*name;		/**< the field name */
+	union ee_value *val;	/**< value assigned to this field */
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_nvfield object.
  *
- * @memberof ee_tag
+ * @memberof ee_nvfield
  * @public
  *
- * @param[in] ctx associated library context
+ * @param[in] ctx library context
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(ee_ctx ctx);
+struct ee_nvfield* ee_newNVField(ee_ctx ctx);
+
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_nvfield object.
  *
- * @memberof ee_tag
+ * @memberof ee_nvfield
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param[in] nvfield object to be destructed
+ *
+ * @param nvfield The nvfield to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteNVField(struct ee_nvfield *nvfield);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_NVFIELD_H_INCLUDED */

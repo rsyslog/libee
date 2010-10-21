@@ -1,7 +1,7 @@
 /**
- * @file tag.h
- * @brief The CEE tag object.
- * @class ee_tag tag.h
+ * @file event.h
+ * @brief Representation of an event.
+ * @class ee_event event.h
  *
  *//*
  *
@@ -26,41 +26,40 @@
  *
  * A copy of the LGPL v2.1 can be found in the file "COPYING" in this distribution.
  */
-#ifndef LIBEE_TAG_H_INCLUDED
-#define	LIBEE_TAG_H_INCLUDED
+#ifndef LIBEE_EVENT_H_INCLUDED
+#define	LIBEE_EVENT_H_INCLUDED
 
 /**
- * The tag class.
- * @extends ee_obj
+ * The event class.
+ * This models an actual event as it happens.
  */
-struct ee_tag {
-	struct ee_obj o;	/*<< the base object */
-	/*struct ee_namelist *altNames;*/
-	struct ee_tagSet *tagset;
-	/* TODO?: add Tag Relation Element -- but first wait how CEE evolves */
+struct ee_event {
+	ee_ctx	ctx;			/**< the library context */
+	struct tagbucket *tags;		/**< tags associated with this event */
+	struct fieldbucket *fields;	/**< fields contained in this event */
 };
 
 /**
- * Constructor for the ee_tag object.
+ * Constructor for the ee_event object.
  *
- * @memberof ee_tag
+ * @memberof ee_event
  * @public
  *
  * @param[in] ctx associated library context
  *
  * @return new library context or NULL if an error occured
  */
-struct ee_tag* ee_newTag(ee_ctx ctx);
+struct ee_event* ee_newEvent(ee_ctx ctx);
 
 /**
- * Destructor for the ee_tag object.
+ * Destructor for the ee_event object.
  *
- * @memberof ee_tag
+ * @memberof ee_event
  * @public
  *
- * @param tag The tag to be discarded.
+ * @param event The event to be discarded.
  */
-void ee_deleteTag(struct ee_tag *tag);
+void ee_deleteEvent(struct ee_event *event);
 
 
-#endif /* #ifndef LIBEE_TAG_H_INCLUDED */
+#endif /* #ifndef LIBEE_EVENT_H_INCLUDED */
