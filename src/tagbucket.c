@@ -33,7 +33,7 @@
 
 #define ERR_ABORT {r = 1; goto done; }
 
-#define CHECK_TAG \
+#define CHECK_TAGBUCKET \
 	if(tagbucket->objID != ObjID_TAGBUCKET) { \
 		r = -1; \
 		goto done; \
@@ -80,4 +80,44 @@ ee_deleteTagbucket(struct ee_tagbucket *tagbucket)
 
 int ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname)
 {
+	int r = 0;
+
+	assert(tagname != NULL);
+	CHECK_TAGBUCKET;
+	// TODO: depending on compliance level, we need
+	// to check if this is a valid tagname
+	/* Note: payload (third parameter) MUST NOT be NULL, otherwise we will
+	 * not see this entry when scanning over the table!
+	 */
+	r = xmlHashAddEntry(tagbucket->ht, (xmlChar*) tagname, "");
+done:
+	return r;
+}
+
+
+/* we can pass only one pointer to libxml2, so we unfortunately
+ * need to set up a structure for the two parameters we have.
+ */
+struct ptr_IteratoroverBucketTags {
+	void (*f)(void *, char*);
+	void *cookie;
+};
+static void IteratorOverBucketTags(void __attribute__((unused)) *payload,
+				   void __attribute__((unused)) *data,
+				   xmlChar *name)
+{
+	struct ptr_IteratoroverBucketTags *iter = (struct ptr_IteratoroverBucketTags*) data;
+	iter->f(iter->cookie, (char*)name);
+}
+
+
+void
+ee_iterateOverBucketTags(struct ee_tagbucket *tagbucket,
+			 void(*f)(void*, char*), void *cookie)
+{
+	static struct ptr_IteratoroverBucketTags iter;
+	assert(f != NULL);
+	iter.f = f;
+	iter.cookie = cookie;
+	xmlHashScan(tagbucket->ht, IteratorOverBucketTags, &iter);
 }

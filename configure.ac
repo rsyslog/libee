@@ -62,6 +62,24 @@ AC_FUNC_MALLOC
 #AC_TYPE_SIGNAL
 #AC_CHECK_FUNCS([])
 
+LIBEE_CFLAGS="-I\$(top_srcdir)/src"
+LIBEE_LIBS="\$(top_builddir)/src/libee.la"
+AC_SUBST(LIBEE_CFLAGS)
+AC_SUBST(LIBEE_LIBS)
+
+# enable/disable the testbench (e.g. because some important parts
+# are missing)
+AC_ARG_ENABLE(testbench,
+        [AS_HELP_STRING([--enable-testbench],[file input module enabled @<:@default=yes@:>@])],
+        [case "${enableval}" in
+         yes) enable_testbench="yes" ;;
+          no) enable_testbench="no" ;;
+           *) AC_MSG_ERROR(bad value ${enableval} for --enable-testbench) ;;
+         esac],
+        [enable_testbench=yes]
+)
+AM_CONDITIONAL(ENABLE_TESTBENCH, test x$enable_testbench = xyes)
+
 
 # debug mode settings
 AC_ARG_ENABLE(debug,
@@ -84,7 +102,8 @@ fi
 
 AC_CONFIG_FILES([Makefile \
 		ee.pc \
-		src/Makefile])
+		src/Makefile \
+		tests/Makefile])
 AC_OUTPUT
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -93,4 +112,4 @@ echo "*****************************************************"
 echo "libee will be compiled with the following settings:"
 echo
 echo "Debug mode enabled:          $enable_debug"
-
+echo "Testbench enabled:           $enable_testbench"

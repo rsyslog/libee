@@ -4,16 +4,45 @@
  *
  * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
  *
- * In essence, it provides a small but hopefully convenient API
- * layer above the CEE standard. Also, processing speed is definitely
+ * CEE is an upcoming standard used to describe network events
+ * in a number of normalized formats. It's goal is to unify they currently
+ * many different representations that exist in the industry.
+ *
+ * The core idea of libee is to provide a small but hopefully convenient
+ * API layer above the CEE standard. However, CEE is not finished. At the
+ * time of this writing, CEE is under heavy development and even some of
+ * its core data structures (like the data dictionary and taxonmy) have
+ * not been fully specified.
+ *
+ * So, as libee developer, I obviously have an issue here: I can't craft
+ * something in code that does not really exist at this very moment. My
+ * solution to this problem is to let me inspire by CEE discussions and
+ * then code what makes most sense in the light of that. I will try hard
+ * to keep up with the draft standard, but some deviation is probably
+ * unavoidable. This is one primary reasons that gave libee it's name:
+ * we were tempted to name it libcee, as this is what the idea of it is,
+ * but we can not yet do so because we don't know how, and how fast, CEE
+ * will evolve. The compromise is to use a name that suggests libee and
+ * CEE may be different things. It is my sincere hope that libee will
+ * be a full CEE implementation when the standard is finally released, but
+ * for obvious reasons I cannot guarantee that.
+ *
+ * So for the time being, libee should be thought of as a useful library
+ * that helps you get your events normalized. If you program cleanly to
+ * libee, chances are not bad that only relatively little effort is required
+ * to move your app over to be CEE compliant (once the standard is out).
+ *
+ * Performance is definitely
  * a goal of this library. As such, it tries to generate in-memory
- * representations of CEE object that will be fast to work with.
+ * representations of expression objects that will be fast to work with.
  * Multi-threaded applications and plugin architectures are fully
  * supported. For the time being, this means that multiple threads
  * are safe as long as different library contexts are being used. It
  * is \b not safe to use the same context concurrently. In the future,
  * ctx may support in-context concurreny via specific options, but
  * this is outside the scope of the initial effort.
+ *
+ * The libee homepage is available at http://www.libee.org/
  *
  * More information on CEE can be found: http://cee.mitre.org/
  *
