@@ -24,6 +24,26 @@ LIBS=
 #rt_libs=$LIBS
 LIBS=$save_LIBS
 
+AC_CHECK_PROG(
+  [HAVE_LIBXML2_CONFIG],
+  [xml2-config],
+  [yes],,,
+)
+if test "x${HAVE_LIBXML2_CONFIG}" != "xyes"; then
+  AC_MSG_FAILURE([xml2-config not found in PATH - this means libxml2 development package is missing])
+fi
+AC_CHECK_LIB(
+  [xml2],
+  [xmlReadFile],
+  [LIBXML2_CFLAGS=`xml2-config --cflags`
+   LIBXML2_LIBS=`xml2-config --libs`
+  ],
+  [AC_MSG_FAILURE([libxml2 is missing])],
+  [`xml2-config --libs`]
+)
+AC_SUBST(LIBXML2_CFLAGS)
+AC_SUBST(LIBXML2_LIBS)
+
 AC_SUBST(rt_libs)
 
 # Checks for header files.
