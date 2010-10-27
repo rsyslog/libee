@@ -77,3 +77,45 @@ ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket)
 	xmlHashFree(fieldbucket->ht, deallocator);
 	free(fieldbucket);
 }
+
+
+int
+ee_addNVFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_nvfield *nvfield)
+{
+	int r;
+	assert(fieldbucket->objID == ObjID_FIELDBUCKET);
+	assert(fieldbucket->objID == ObjID_NVFIELD);
+	/* for the time being, we accept name "duplication" (it points to the same
+	 * string in any case, so that's not too bad...)
+	 */
+	r = xmlHashAddEntry(fieldbucket->ht, (xmlChar*) nvfield->name, nvfield);
+	return r;
+}
+
+
+/* we can pass only one pointer to libxml2, so we unfortunately
+ * need to set up a structure for the two parameters we have.
+ */
+struct ptr_IteratoroverFieldTags {
+	void (*f)(void *, char*);
+	void *cookie;
+};
+static void IteratorOverFieldTags(void __attribute__((unused)) *payload,
+				   void __attribute__((unused)) *data,
+				   xmlChar *name)
+{
+	struct ptr_IteratoroverFieldTags *iter = (struct ptr_IteratoroverFieldTags*) data;
+	iter->f(iter->cookie, (char*)name);
+}
+
+
+void
+ee_iterateOverFieldTags(struct ee_fieldbucket *fieldbucket,
+			 void(*f)(void*, char*), void *cookie)
+{
+	static struct ptr_IteratoroverFieldTags iter;
+	assert(f != NULL);
+	iter.f = f;
+	iter.cookie = cookie;
+	xmlHashScan(fieldbucket->ht, IteratorOverFieldTags, &iter);
+}

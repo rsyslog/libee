@@ -79,7 +79,7 @@ ee_deleteTagbucket(struct ee_tagbucket *tagbucket)
 
 int ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname)
 {
-	int r = 0;
+	int r;
 
 	assert(tagname != NULL);
 	CHECK_TAGBUCKET;

@@ -1,6 +1,6 @@
 /**
- * @file nvfield.c
- * Implements nvfield object methods.
+ * @file value.c
+ * Implements value object methods.
  *//* Libee - An Event Expression Library inspired by CEE
  * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
  *
@@ -29,47 +29,24 @@
 #include <assert.h>
 
 #include "libee/libee.h"
-
-#define ERR_ABORT {r = 1; goto done; }
-
-#define CHECK_FIELD \
-	if(nvfield->objID != ObjID_NVFIELD) { \
-		r = -1; \
-		goto done; \
-	}
+#include "libee/value.h"
 
 
-/* In this version of the method, we simply create a copy of the field name. In
- * later versions, depending on our state and compliance level, we may use
- * a pointer to an in-memory representation of the dictionary entity instead.
- * rgerhards, 2010-10-26
- */
-struct ee_nvfield*
-ee_newNVField(ee_ctx __attribute__((unused)) ctx, char *name, union ee_value *val)
+union ee_value*
+ee_newValue(ee_ctx ctx)
 {
-	struct ee_nvfield *nvfield;
-	assert(val == ObjID_VALUE);
-	if((nvfield = malloc(sizeof(struct ee_nvfield))) == NULL)
+	union ee_value *value;
+	if((value = malloc(sizeof(union ee_value))) == NULL)
 		goto done;
-
-	if((nvfield->name = strdup(name)) == NULL) {
-		free(nvfield);
-		nvfield = NULL;
-		goto done;
-	}
-
-	nvfield->objID = ObjID_NVFIELD;
-	nvfield->ctx = ctx;
-	nvfield->val = val;
 
 done:
-	return nvfield;
+	return value;
 }
 
 
 void
-ee_deleteNVField(struct ee_nvfield *nvfield)
+ee_deleteValue(union ee_value *value)
 {
-	assert(nvfield->objID == ObjID_NVFIELD);
-	free(nvfield);
+	assert(value->objID == ObjID_VALUE);
+	free(value);
 }

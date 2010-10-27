@@ -48,4 +48,29 @@ union ee_value {
 	char *str;
 };
 
+
+/**
+ * Constructor for the ee_value object.
+ *
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] ctx library context
+ *
+ * @return newly created object or NULL if an error occured
+ */
+union ee_value* ee_newValue(ee_ctx ctx);
+
+
+/**
+ * Destructor for the ee_value object.
+ *
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] value object to be destructed
+ */
+void ee_deleteValue(union ee_value *value);
+
+
 #endif /* #ifndef LIBEE_VALUE_H_INCLUDED */

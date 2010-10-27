@@ -162,6 +162,7 @@
 #include "libee/fieldbucket.h"
 #include "libee/primitivetype.h"
 #include "libee/tagbucket.h"
+#include "libee/event.h"
 
 /* some private error codes (always negative)
  */

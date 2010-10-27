@@ -66,4 +66,18 @@ struct ee_fieldbucket* ee_newFieldbucket(ee_ctx ctx);
 void ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket);
 
 
+/**
+ * Add a nvfield to the bucket.
+ *
+ * @memberof ee_tagbucket
+ * @public
+ *
+ * @param[in] bucket	the bucket to modify
+ * @param[in] nvfield	nvfield to be added
+ *
+ * @return 0 on success, something else otherwise
+ */
+int ee_addNVFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_nvfield *nvfield);
+
+
 #endif /* #ifndef LIBEE_FIELDBUCKET_H_INCLUDED */

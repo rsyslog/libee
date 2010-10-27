@@ -1,4 +1,4 @@
-SUBDIRS = src tests include
+SUBDIRS = tests include src
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ee.pc

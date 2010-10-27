@@ -51,10 +51,12 @@ struct ee_nvfield {
  * @public
  *
  * @param[in] ctx library context
+ * @param[in] name field name
+ * @param[in] val value
  *
- * @return new library context or NULL if an error occured
+ * @return new nvfield or NULL if an error occured
  */
-struct ee_nvfield* ee_newNVField(ee_ctx ctx);
+struct ee_nvfield* ee_newNVField(ee_ctx ctx, char *name, union ee_value *val);
 
 
 /**

@@ -34,9 +34,10 @@
  * This models an actual event as it happens.
  */
 struct ee_event {
+	unsigned objID;		/**< a magic number to prevent some memory adressing errors */
 	ee_ctx	ctx;			/**< the library context */
-	struct tagbucket *tags;		/**< tags associated with this event */
-	struct fieldbucket *fields;	/**< fields contained in this event */
+	struct ee_tagbucket *tags;		/**< tags associated with this event */
+	struct ee_fieldbucket *fields;	/**< fields contained in this event */
 };
 
 /**
@@ -62,4 +63,67 @@ struct ee_event* ee_newEvent(ee_ctx ctx);
 void ee_deleteEvent(struct ee_event *event);
 
 
+/**
+ * Add a tag to the event.
+ *
+ * The tag is provided as a string. If no tag bucket exists when
+ * this method is called, one is created. 
+ *
+ * <b>This is part of the ezAPI for libee</b>
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event where tag shall be added
+ * @param tag   string representing a tag name. The tag must \b not
+ *              already exist inside the tagbucket. Libee will copy
+ *              the string, so the caller must free it itself if required.
+ *
+ * @return	0 on success, something else otherwise.
+ */
+int ee_addTagToEvent(struct ee_event *event, char *tag);
+
+
+/**
+ * Add a string field name-value pair to the event. 
+ *
+ * This adds a name-value pair (NVField) to the event. The value must be
+ * a string value. If no fieldbucket yet exists, one is created.
+ *
+ * <b>This is part of the ezAPI for libee</b>
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event where nvfield shall be added
+ * @param[in] fieldname Name of the field to be added. The field name must \b not
+ *                  already exist inside the fieldbucket. Libee will copy
+ *                  the field name, so the caller must free it itself if required.
+ * @param[in] value value of the field to be added. Libee will copy
+ *                  the string, so the caller must free it itself if required.
+ *
+ * @return	0 on success, something else otherwise.
+ */
+int ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, char *value);
+
+
+/**
+ * Format an event in syslog RFC 5424 format.
+ *
+ * This method takes an event and creates a new string representation
+ * in RFC5424 format. The string is passed to the caller, which then
+ * is responsible for freeing it.
+ *
+ * <b>This is part of the ezAPI for libee</b>
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event to format
+ * @param[out] buf pointer to newly created string
+ * @param[out] lenBuf size of newly created string (excluding NUL)
+
+ * @return	0 on success, something else otherwise.
+ */
+int ee_fmtEventToRFC5424(struct ee_event *event, char **buf, size_t *lenBuf);
 #endif /* #ifndef LIBEE_EVENT_H_INCLUDED */

@@ -16,6 +16,8 @@ lib_LTLIBRARIES = libee.la
 libee_la_SOURCES = \
 	ctx.c \
 	tag.c \
+	event.c \
+	value.c \
 	tagbucket.c \
 	nvfield.c \
 	fieldbucket.c \
