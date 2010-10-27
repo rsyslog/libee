@@ -1,6 +1,6 @@
 /**
- * @file tagbucket1.c
- * @brief A very basic test for the tagbucket class.
+ * @file ezAPI1.c
+ * @brief A very basic test for the event class.
  *
  * @author Rainer Gerhards <rgerhards@adiscon.com>
  *
@@ -28,19 +28,11 @@
  */
 #include "config.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <getopt.h>
 #include "config.h"
 #include "libee/libee.h"
 
 static ee_ctx ctx;
-
-void
-TagOutputCB(void __attribute__((unused)) *cookie, char *tagname)
-{
-	printf("%s\n", tagname);
-}
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -60,8 +52,11 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	FILE *fpIn = stdin;
-	char lnbuf[1024];
-	struct ee_tagbucket *tagbucket;
+	char *outbuf;
+	size_t lenOutBuf;
+	char namebuf[1024];
+	char valbuf[1024];
+	struct ee_event *event;
 
 	while((opt = getopt(argc, argv, "i:")) != -1) {
 		switch (opt) {
@@ -92,18 +87,22 @@ int main(int argc, char *argv[])
 
 	ee_setDebugCB(ctx, dbgCallBack, NULL);
 
-	if((tagbucket = ee_newTagbucket(ctx)) == NULL)
-		errout("could not create tag bucket");
-	/* add tags */
+	if((event = ee_newEvent(ctx)) == NULL)
+		errout("could not create event");
+	/* add fields
+	 * file contains name, value on seperatelines */
 	while(!feof(fpIn)) {
-		if(fgets(lnbuf, sizeof(lnbuf), fpIn) != NULL) {
-			lnbuf[strlen(lnbuf)-1] = '\0'; /* strip '\n' */
-			ee_addTagToBucket(tagbucket, lnbuf);
+		if(fgets(namebuf, sizeof(namebuf), fpIn) != NULL) {
+			namebuf[strlen(namebuf)-1] = '\0'; /* strip '\n' */
+			if(fgets(valbuf, sizeof(valbuf), fpIn) == NULL)
+				errout("invalid test case file format!");
+			valbuf[strlen(valbuf)-1] = '\0'; /* strip '\n' */
+			ee_addStrFieldToEvent(event, namebuf, valbuf);
 		}
 	}
 
-	ee_iterateOverBucketTags(tagbucket, TagOutputCB, NULL);
-	ee_deleteTagbucket(tagbucket);
+	ee_fmtEventToRFC5424(event, &outbuf, &lenOutBuf);
+	printf("Formatted event: '%s'\n", outbuf);
 
 	ee_exitCtx(ctx);
 	return 0;

@@ -50,3 +50,12 @@ ee_deleteValue(union ee_value *value)
 	assert(value->objID == ObjID_VALUE);
 	free(value);
 }
+
+
+int
+ee_setStrValue(union ee_value *value, char *val)
+{
+	assert(value->objID == ObjID_VALUE);
+	value->str = strdup(val);
+	return 0;
+}

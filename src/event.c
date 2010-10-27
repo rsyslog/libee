@@ -29,6 +29,8 @@
 #include <assert.h>
 
 #include "libee/libee.h"
+#include "libee/nvfield.h"
+#include "libee/value.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 
@@ -94,6 +96,7 @@ ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, char *value)
 	if(event->fields == NULL)
 		if((event->fields = ee_newFieldbucket(event->ctx)) == NULL)
 			goto done;
+//printf("addStrField: %s/%s\n", fieldname, value);
 
 	if((val = ee_newValue(event->ctx)) == NULL) goto done;
 	if((r = ee_setStrValue(val, value)) != 0) goto done;
@@ -112,19 +115,56 @@ done:
 	return r;
 }
 
+
+/* TODO: create much more solid code. This here is a HACK! */
+static void copy2String(char *str, size_t *offs, char *toAdd)
+{
+	strcpy(str+*offs, toAdd);
+	*offs = strlen(str);
+}
+
+/* we can pass only one pointer to libxml2, so we unfortunately
+ * need to set up a structure for the two parameters we have.
+ */
+struct data_IteratorRFC5424 {
+	char *buf;
+	size_t lenBuf;
+	size_t lenCurr;
+};
+/* callback used to build the strings */
+static void IteratorRFC5424(void __attribute__((unused)) *payload,
+				   void __attribute__((unused)) *data,
+				   xmlChar *name)
+{
+	struct data_IteratorRFC5424 *iter = (struct data_IteratorRFC5424 *) data;
+	char buf[10240];
+
+printf("name=%s, value=%s\n", name, ((struct ee_nvfield*) payload)->val->str);
+	sprintf(buf, " %s=\"%s\"", name, ((struct ee_nvfield*) payload)->val->str);
+	copy2String(iter->buf, &iter->lenCurr, buf);
+}
 /* TODO: do a *real* implementation. The code below is just a
  * rough tester.
+ */
+/* Note: for efficiency reasons, we "break up" the object model a bit
+ * here: In order to avoid inefficiency when calling the hashScan function,
+ * I iterate over the hash table holding the fields here. Note that this
+ * object here should *not* know it is actually dealing with a hash table.
+ * rgerhards, 2010-10-27
  */
 int
 ee_fmtEventToRFC5424(struct ee_event *event, char **pbuf, size_t *plenBuf)
 {
 	int r = -1;
-	char *buf;
-	size_t lenBuf;
+	struct data_IteratorRFC5424 iter;
 
 	assert(event->objID == ObjID_EVENT);
-	buf = malloc(10240); // TODO: something real!
+	iter.buf = malloc(10240); // TODO: something real!
+	iter.lenBuf = 10240;
+	iter.lenCurr = 0;
 
+	xmlHashScan(event->fields->ht, IteratorRFC5424, &iter);
+	*pbuf = iter.buf;
 
 done:
 	return r;

@@ -5,7 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT([libee], [0.0.0], [rgerhards@adiscon.com])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
-AC_CONFIG_SRCDIR([src/libee.h])
+AC_CONFIG_SRCDIR([src/ctx.c])
 AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.
@@ -62,7 +62,7 @@ AC_FUNC_MALLOC
 #AC_TYPE_SIGNAL
 #AC_CHECK_FUNCS([])
 
-LIBEE_CFLAGS="-I\$(top_srcdir)/src"
+LIBEE_CFLAGS="-I\$(top_srcdir)/include"
 LIBEE_LIBS="\$(top_builddir)/src/libee.la"
 AC_SUBST(LIBEE_CFLAGS)
 AC_SUBST(LIBEE_LIBS)

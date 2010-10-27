@@ -72,5 +72,14 @@ union ee_value* ee_newValue(ee_ctx ctx);
  */
 void ee_deleteValue(union ee_value *value);
 
-
+/**
+ * Set the value to the provided string.
+ * This functions is \b preliminary and must be
+ * replace by one with better code / calling interface.
+ *
+ * @memberof ee_value
+ * @public
+ *
+ */
+int ee_setStrValue(union ee_value *value, char *val);
 #endif /* #ifndef LIBEE_VALUE_H_INCLUDED */
