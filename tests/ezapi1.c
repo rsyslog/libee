@@ -29,6 +29,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <getopt.h>
+#include <libestr.h>
 #include "config.h"
 #include "libee/libee.h"
 
@@ -52,10 +53,10 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	FILE *fpIn = stdin;
-	char *outbuf;
-	size_t lenOutBuf;
+	es_str_t *out;
 	char namebuf[1024];
 	char valbuf[1024];
+	es_str_t *str;
 	struct ee_event *event;
 
 	while((opt = getopt(argc, argv, "i:")) != -1) {
@@ -97,12 +98,14 @@ int main(int argc, char *argv[])
 			if(fgets(valbuf, sizeof(valbuf), fpIn) == NULL)
 				errout("invalid test case file format!");
 			valbuf[strlen(valbuf)-1] = '\0'; /* strip '\n' */
-			ee_addStrFieldToEvent(event, namebuf, valbuf);
+			str = es_newStrFromCStr(valbuf, strlen(valbuf));
+			ee_addStrFieldToEvent(event, namebuf, str);
 		}
 	}
 
-	ee_fmtEventToRFC5424(event, &outbuf, &lenOutBuf);
-	printf("Formatted event: '%s'\n", outbuf);
+	ee_fmtEventToRFC5424(event, &out);
+	printf("Formatted event: '%s'\n", es_str2cstr(out, NULL));
+	es_deleteStr(out);
 
 	ee_exitCtx(ctx);
 	return 0;

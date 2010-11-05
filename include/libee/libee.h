@@ -153,6 +153,7 @@
 #ifndef LIBEE_H_INCLUDED
 #define	LIBEE_H_INCLUDED
 #include <stdlib.h>	/* we need size_t */
+#include <libestr.h>
 #include "libee/obj.h"
 #include "libee/ctx.h"
 #include "libee/timestamp.h"

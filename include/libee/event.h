@@ -99,12 +99,11 @@ int ee_addTagToEvent(struct ee_event *event, char *tag);
  * @param[in] fieldname Name of the field to be added. The field name must \b not
  *                  already exist inside the fieldbucket. Libee will copy
  *                  the field name, so the caller must free it itself if required.
- * @param[in] value value of the field to be added. Libee will copy
- *                  the string, so the caller must free it itself if required.
+ * @param[in] value value of the field to be added. 
  *
  * @return	0 on success, something else otherwise.
  */
-int ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, char *value);
+int ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value);
 
 
 /**
@@ -120,10 +119,9 @@ int ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, char *value);
  * @public
  *
  * @param event event to format
- * @param[out] buf pointer to newly created string
- * @param[out] lenBuf size of newly created string (excluding NUL)
+ * @param[out] str pointer to string with RFC5424 representation, caller must destruct
 
  * @return	0 on success, something else otherwise.
  */
-int ee_fmtEventToRFC5424(struct ee_event *event, char **buf, size_t *lenBuf);
+int ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str);
 #endif /* #ifndef LIBEE_EVENT_H_INCLUDED */

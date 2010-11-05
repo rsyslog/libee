@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <libestr.h>
 
 #include "libee/libee.h"
 #include "libee/nvfield.h"
@@ -86,7 +87,7 @@ done:
 
 
 int
-ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, char *value)
+ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 {
 	int r = -1;
 	struct ee_nvfield *nvfield = NULL;
@@ -96,7 +97,7 @@ ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, char *value)
 	if(event->fields == NULL)
 		if((event->fields = ee_newFieldbucket(event->ctx)) == NULL)
 			goto done;
-//printf("addStrField: %s/%s\n", fieldname, value);
+//printf("addStrField: %s/%s\n", fieldname, es_str2cstr(value, NULL));
 
 	if((val = ee_newValue(event->ctx)) == NULL) goto done;
 	if((r = ee_setStrValue(val, value)) != 0) goto done;
@@ -123,25 +124,22 @@ static void copy2String(char *str, size_t *offs, char *toAdd)
 	*offs = strlen(str);
 }
 
-/* we can pass only one pointer to libxml2, so we unfortunately
- * need to set up a structure for the two parameters we have.
- */
-struct data_IteratorRFC5424 {
-	char *buf;
-	size_t lenBuf;
-	size_t lenCurr;
-};
 /* callback used to build the strings */
 static void IteratorRFC5424(void __attribute__((unused)) *payload,
 				   void __attribute__((unused)) *data,
 				   xmlChar *name)
 {
-	struct data_IteratorRFC5424 *iter = (struct data_IteratorRFC5424 *) data;
-	char buf[10240];
+	es_str_t **str = (es_str_t**) data;
 
-printf("name=%s, value=%s\n", name, ((struct ee_nvfield*) payload)->val->str);
-	sprintf(buf, " %s=\"%s\"", name, ((struct ee_nvfield*) payload)->val->str);
-	copy2String(iter->buf, &iter->lenCurr, buf);
+	char *cstr;
+	cstr = es_str2cstr(((struct ee_nvfield*) payload)->val->str, NULL);
+//printf("name=%s, value=%s\n", name, cstr);
+	free(cstr);
+	es_addChar(str, ' ');
+	es_addBuf(str, (char*)name, strlen((char*)name));
+	es_addBuf(str, "=\"", 2);
+	es_addStr(str, ((struct ee_nvfield*) payload)->val->str);
+	es_addChar(str, '\"');
 }
 /* TODO: do a *real* implementation. The code below is just a
  * rough tester.
@@ -153,18 +151,14 @@ printf("name=%s, value=%s\n", name, ((struct ee_nvfield*) payload)->val->str);
  * rgerhards, 2010-10-27
  */
 int
-ee_fmtEventToRFC5424(struct ee_event *event, char **pbuf, size_t *plenBuf)
+ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
-	struct data_IteratorRFC5424 iter;
 
 	assert(event->objID == ObjID_EVENT);
-	iter.buf = malloc(10240); // TODO: something real!
-	iter.lenBuf = 10240;
-	iter.lenCurr = 0;
+	if((*str = es_newStr(256)) == NULL) goto done;
 
-	xmlHashScan(event->fields->ht, IteratorRFC5424, &iter);
-	*pbuf = iter.buf;
+	xmlHashScan(event->fields->ht, IteratorRFC5424, str);
 
 done:
 	return r;

@@ -53,9 +53,9 @@ ee_deleteValue(union ee_value *value)
 
 
 int
-ee_setStrValue(union ee_value *value, char *val)
+ee_setStrValue(union ee_value *value, es_str_t *val)
 {
 	assert(value->objID == ObjID_VALUE);
-	value->str = strdup(val);
+	value->str = val;
 	return 0;
 }

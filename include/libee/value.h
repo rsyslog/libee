@@ -45,7 +45,7 @@
 union ee_value {
 	struct ee_timestamp ts;
 	long long number;
-	char *str;
+	es_str_t *str;
 };
 
 
@@ -81,5 +81,5 @@ void ee_deleteValue(union ee_value *value);
  * @public
  *
  */
-int ee_setStrValue(union ee_value *value, char *val);
+int ee_setStrValue(union ee_value *value, es_str_t *val);
 #endif /* #ifndef LIBEE_VALUE_H_INCLUDED */

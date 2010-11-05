@@ -67,6 +67,9 @@ LIBEE_LIBS="\$(top_builddir)/src/libee.la"
 AC_SUBST(LIBEE_CFLAGS)
 AC_SUBST(LIBEE_LIBS)
 
+# modules we require
+PKG_CHECK_MODULES(LIBESTR, libestr >= 0.0.0)
+
 # enable/disable the testbench (e.g. because some important parts
 # are missing)
 AC_ARG_ENABLE(testbench,
