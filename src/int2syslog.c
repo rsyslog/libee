@@ -55,7 +55,12 @@ void errout(char *errmsg)
  */
 static int cbNewEvt(struct ee_event *event)
 {
+	es_str_t *out;
+
 	printf("received event!\n");
+	ee_fmtEventToRFC5424(event, &out);
+	printf("Formatted event: '%s'\n", es_str2cstr(out, NULL));
+	es_deleteStr(out);
 
 	return 0;
 }
@@ -89,7 +94,6 @@ int main(int argc, char *argv[])
 {
 	int r;
 	int opt;
-	es_str_t *out;
 	es_str_t *errmsg;
 	char errbuf[1024];
 
@@ -125,12 +129,6 @@ int main(int argc, char *argv[])
 		printf(errbuf, "error %d in decoding stage: \n", r);
 		errout(errbuf);
 	}
-
-#if 0
-	ee_fmtEventToRFC5424(event, &out);
-	printf("Formatted event: '%s'\n", es_str2cstr(out, NULL));
-	es_deleteStr(out);
-#endif
 
 	ee_exitCtx(ctx);
 	return 0;

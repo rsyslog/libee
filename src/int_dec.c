@@ -79,7 +79,6 @@ static inline int
 finishField(struct ee_event *event, struct ee_field **field)
 {
 	int r;
-printf("finishField 1\n");
 	if(*field != NULL) {
 		CHKR(ee_addFieldToEvent(event, *field));
 		*field = NULL;
@@ -109,7 +108,6 @@ processLn(ee_ctx ctx, char typ, es_str_t *value, struct ee_event **event,
 		/* comment - ignore */
 		break;
 	case 'e':
-printf("type event\n");
 		if(*event != NULL) {
 			CHKR(finishField(*event, field));
 			CHKR(cbNewEvt(*event));
@@ -117,7 +115,6 @@ printf("type event\n");
 		CHKN(*event = ee_newEvent(ctx));
 		break;
 	case 'f':
-printf("type field\n");
 		if(*event == NULL) {
 			r = EE_INVLDFMT;
 			goto done;
@@ -127,7 +124,6 @@ printf("type field\n");
 		CHKR(ee_nameField(*field, value));
 		break;
 	case 'v':
-printf("type value\n");
 		if(*field == NULL) {
 			r = EE_INVLDFMT;
 			goto done;

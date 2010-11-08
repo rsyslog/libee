@@ -51,6 +51,8 @@ ee_newEvent(ee_ctx __attribute__((unused)) ctx)
 
 	event->objID = ObjID_EVENT;
 	event->ctx = ctx;
+	event->fields = NULL;
+	event->tags = NULL;
 
 done:
 	return event;
@@ -168,7 +170,9 @@ ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
+	es_addBuf(str, "[cee@...", 8);
 	xmlHashScan(event->fields->ht, IteratorRFC5424, str);
+	es_addChar(str, ']');
 
 done:
 	return r;

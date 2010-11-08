@@ -88,7 +88,9 @@ ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field)
 	/* for the time being, we accept name "duplication" (it points to the same
 	 * string in any case, so that's not too bad...)
 	 */
-	r = xmlHashAddEntry(fieldbucket->ht, (xmlChar*) field->name, field);
+	char *name;
+	name = es_str2cstr(field->name, NULL);
+	r = xmlHashAddEntry(fieldbucket->ht, (xmlChar*) name, field);
 	return r;
 }
 
