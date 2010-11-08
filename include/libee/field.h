@@ -130,4 +130,18 @@ int ee_nameField(struct ee_field *field, es_str_t *name);
  */
 int ee_addValueToField(struct ee_field *field, struct ee_value *val);
 
+/**
+ * Encode the current field with all its values in syslog format
+ * and append this representation to the provided string.
+ * 
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] field field to enocde
+ * @param[out]  str string to wich the encoded value is to be added.
+ * 		   Must have been allocated by the caller.
+ * @returns 0 on success, something else otherwise
+ */
+int ee_addField_Syslog(struct ee_field *value, es_str_t **str);
+
 #endif /* #ifndef LIBEE_FIELD_H_INCLUDED */

@@ -43,7 +43,7 @@ decodeLn(es_str_t *ln, char *typ, es_str_t **value)
 {
 	int r ;
 
-	if(es_strlen(ln) < 3) {
+	if(es_strlen(ln) < 2) {
 		r = EE_INVLDFMT;
 		goto done;
 	}

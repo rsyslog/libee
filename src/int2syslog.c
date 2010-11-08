@@ -36,6 +36,7 @@
 
 static ee_ctx ctx;
 static FILE *fpIn;
+static int verbose = 0;
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -57,7 +58,6 @@ static int cbNewEvt(struct ee_event *event)
 {
 	es_str_t *out;
 
-	printf("received event!\n");
 	ee_fmtEventToRFC5424(event, &out);
 	printf("Formatted event: '%s'\n", es_str2cstr(out, NULL));
 	es_deleteStr(out);
@@ -78,9 +78,12 @@ cbGetLine(es_str_t **ln)
 		goto done;
 	}
 	len = strlen(buf);
+	//if(len > 0)
+		//len--;
 	buf[len-1] = '\0'; /* strip '\n' */
-printf("Read line <%s>\n", buf);
-	if((*ln = es_newStrFromCStr(buf, len)) == NULL) {
+	if(verbose)
+		printf("Read line[%u] '%s'\n", (unsigned) len, buf);
+	if((*ln = es_newStrFromCStr(buf, len-1)) == NULL) {
 		r = EE_NOMEM;
 		goto done;
 	}
@@ -98,13 +101,16 @@ int main(int argc, char *argv[])
 	char errbuf[1024];
 
 	fpIn = stdin;
-	while((opt = getopt(argc, argv, "i:")) != -1) {
+	while((opt = getopt(argc, argv, "i:v")) != -1) {
 		switch (opt) {
 		case 'i':
 			if((fpIn = fopen(optarg, "r")) == NULL) {
 				perror(optarg);
 				exit(1);
 			}
+			break;
+		case 'v':
+			verbose = 1;
 			break;
 		default:
 			printf("invalid option '%c' or value missing - "
@@ -126,7 +132,7 @@ int main(int argc, char *argv[])
 	ee_setDebugCB(ctx, dbgCallBack, NULL);
 
 	if((r = ee_intDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
-		printf(errbuf, "error %d in decoding stage: \n", r);
+		snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: \n", r);
 		errout(errbuf);
 	}
 

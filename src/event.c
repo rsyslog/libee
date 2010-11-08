@@ -137,25 +137,16 @@ done:
 
 
 /* callback used to build the strings */
-static void IteratorRFC5424(void __attribute__((unused)) *payload,
-				   void __attribute__((unused)) *data,
-				   xmlChar *name)
+static void IteratorRFC5424(void *payload, void *data,
+				   xmlChar __attribute__((unused)) *name)
 {
+	struct ee_field *field = (struct ee_field*) payload;
 	es_str_t **str = (es_str_t**) data;
 
-	char *cstr;
-	cstr = es_str2cstr(((struct ee_field*) payload)->val->val.str, NULL);
-//printf("name=%s, value=%s\n", name, cstr);
-	free(cstr);
+	assert(field->objID == ObjID_FIELD);
 	es_addChar(str, ' ');
-	es_addBuf(str, (char*)name, strlen((char*)name));
-	es_addBuf(str, "=\"", 2);
-	es_addStr(str, ((struct ee_field*) payload)->val->val.str);
-	es_addChar(str, '\"');
+	ee_addField_Syslog(field, str);
 }
-/* TODO: do a *real* implementation. The code below is just a
- * rough tester.
- */
 /* Note: for efficiency reasons, we "break up" the object model a bit
  * here: In order to avoid inefficiency when calling the hashScan function,
  * I iterate over the hash table holding the fields here. Note that this
