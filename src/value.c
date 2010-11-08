@@ -32,12 +32,14 @@
 #include "libee/value.h"
 
 
-union ee_value*
+struct ee_value*
 ee_newValue(ee_ctx ctx)
 {
-	union ee_value *value;
-	if((value = malloc(sizeof(union ee_value))) == NULL)
+	struct ee_value *value;
+	if((value = malloc(sizeof(struct ee_value))) == NULL)
 		goto done;
+	value->objID = ObjID_VALUE;
+	value->valtype = ee_valtype_none;
 
 done:
 	return value;
@@ -45,7 +47,7 @@ done:
 
 
 void
-ee_deleteValue(union ee_value *value)
+ee_deleteValue(struct ee_value *value)
 {
 	assert(value->objID == ObjID_VALUE);
 	free(value);
@@ -53,9 +55,11 @@ ee_deleteValue(union ee_value *value)
 
 
 int
-ee_setStrValue(union ee_value *value, es_str_t *val)
+ee_setStrValue(struct ee_value *value, es_str_t *val)
 {
 	assert(value->objID == ObjID_VALUE);
-	value->str = val;
+	assert(value->valtype = ee_valtype_none);
+	value->valtype = ee_valtype_str;
+	value->val.str = val;
 	return 0;
 }

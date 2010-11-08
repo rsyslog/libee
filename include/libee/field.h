@@ -43,7 +43,7 @@ struct ee_field {
 	int objID;		/**< magic number to identify the object */
 	ee_ctx ctx;		/**< associated library context */
 	char	*name;		/**< the field name */
-	union ee_value *val;	/**< value assigned to this field */
+	struct ee_value *val;	/**< value assigned to this field */
 };
 
 /**
@@ -72,7 +72,7 @@ struct ee_field* ee_newField(ee_ctx ctx);
  *
  * @return new field or NULL if an error occured
  */
-struct ee_field* ee_newFieldFromNV(ee_ctx ctx, char *name, union ee_value *val);
+struct ee_field* ee_newFieldFromNV(ee_ctx ctx, char *name, struct ee_value *val);
 
 /**
  * Destructor for the ee_field object.

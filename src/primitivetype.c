@@ -103,7 +103,7 @@ hParseInt(char **buf, size_t *lenBuf)
  */
 #define BEGINParser(ParserName) \
 size_t parse##ParserName(ee_ctx __attribute__((unused)) ctx, char **buf, size_t *lenBuf, \
-                      union ee_value **newVal) \
+                      struct ee_value **newVal) \
 { \
 	size_t r = -1; \
 	assert(lenBuf > 0);
@@ -359,13 +359,14 @@ BEGINParser(Number)
 	if(p == *buf)
 		goto fail;
 
-	if((*newVal = malloc(sizeof(union ee_value))) == NULL) {
+	if((*newVal = malloc(sizeof(struct ee_value))) == NULL) {
 		r = EE_NOMEM;
 		goto fail;
 	}
 
 	/* success, persist */
-	(*newVal)->number = n;
+	(*newVal)->valtype = ee_valtype_nbr;
+	(*newVal)->val.number = n;
 	*buf =p;
 	*lenBuf = len;
 fail:

@@ -35,17 +35,23 @@
  * We do not have a typed system, but we need efficient representations for
  * various simple types. As such, we define one big union that contains
  * definitions for all value types envisible. If a new primitive type is
- * added, this union must be extended. There is NO type indicateor inside the
- * value class itself, because a value is always assigned to a field and so
- * the field type defines the value type as well (via its restrictions).
- * @note
- * This sounds a bit ugly and hard to debug. We should probably reconsider
- * this decision once we got a bit more experience with the system.
+ * added, this union must be extended.
+ * Note that we need to have a type indicator, as we do not always have a
+ * loaded dictionary (or the library may be in non-validating mode!).
  */
-union ee_value {
-	struct ee_timestamp ts;
-	long long number;
-	es_str_t *str;
+struct ee_value {
+	unsigned objID;
+		/**< a magic number to prevent some memory adressing errors */
+	enum {
+		ee_valtype_none = 0,
+		ee_valtype_str = 1,
+		ee_valtype_nbr = 2
+	} valtype;	/**< type of the value, selects union member */
+	union {
+		struct ee_timestamp ts;
+		long long number;
+		es_str_t *str;
+	} val;		/**< the actual value */
 };
 
 
@@ -59,7 +65,7 @@ union ee_value {
  *
  * @return newly created object or NULL if an error occured
  */
-union ee_value* ee_newValue(ee_ctx ctx);
+struct ee_value* ee_newValue(ee_ctx ctx);
 
 
 /**
@@ -70,7 +76,7 @@ union ee_value* ee_newValue(ee_ctx ctx);
  *
  * @param[in] value object to be destructed
  */
-void ee_deleteValue(union ee_value *value);
+void ee_deleteValue(struct ee_value *value);
 
 /**
  * Set the value to the provided string.
@@ -81,5 +87,6 @@ void ee_deleteValue(union ee_value *value);
  * @public
  *
  */
-int ee_setStrValue(union ee_value *value, es_str_t *val);
+int ee_setStrValue(struct ee_value *value, es_str_t *val);
+
 #endif /* #ifndef LIBEE_VALUE_H_INCLUDED */

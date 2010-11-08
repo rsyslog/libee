@@ -63,7 +63,7 @@ ee_deleteField(struct ee_field *field)
  * rgerhards, 2010-10-26
  */
 struct ee_field*
-ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, union ee_value *val)
+ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, struct ee_value *val)
 {
 	struct ee_field *field;
 	assert(val == ObjID_VALUE);
