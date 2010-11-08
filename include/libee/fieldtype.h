@@ -1,6 +1,6 @@
 /**
  * @file fieldtype.h
- * @brief The CEE fieldtype object.
+ * @brief The fieldtype object.
  * @class ee_fieldtype fieldtype.h
  *
  *//*
@@ -30,7 +30,12 @@
 #define	LIBEE_FIELDTYPE_H_INCLUDED
 
 /**
- * The CEE Fieldtype object.
+ * The Fieldtype class.
+ * This class describes properties of fields, like the syntax they have.
+ * It represents a dictionary object.
+ * 
+ * In v0.5 of the interim CEE spec, this was called a "Field".
+ *
  * @extends ee_obj
  */
 struct ee_fieldtype {

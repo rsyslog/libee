@@ -155,7 +155,7 @@ ee_intDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 	char errMsgBuf[1024];
 	size_t errlen;
 	
-	lnNbr = 0;
+	lnNbr = 1;
 	r = cbGetLine(&ln);
 	while(r == 0) {
 		if((r = decodeLn(ln, &typ, &value)) != 0) {

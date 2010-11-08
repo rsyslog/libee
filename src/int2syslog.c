@@ -78,15 +78,16 @@ cbGetLine(es_str_t **ln)
 		goto done;
 	}
 	len = strlen(buf);
-	//if(len > 0)
-		//len--;
-	buf[len-1] = '\0'; /* strip '\n' */
+	if(len > 0)
+		len--;
+	buf[len] = '\0'; /* strip '\n' */
 	if(verbose)
 		printf("Read line[%u] '%s'\n", (unsigned) len, buf);
-	if((*ln = es_newStrFromCStr(buf, len-1)) == NULL) {
+	if((*ln = es_newStrFromCStr(buf, len)) == NULL) {
 		r = EE_NOMEM;
 		goto done;
 	}
+	es_unescapeStr(*ln);
 	r = 0;
 done:
 	return r;
@@ -98,6 +99,7 @@ int main(int argc, char *argv[])
 	int r;
 	int opt;
 	es_str_t *errmsg;
+	unsigned char *cstr;
 	char errbuf[1024];
 
 	fpIn = stdin;
@@ -132,7 +134,10 @@ int main(int argc, char *argv[])
 	ee_setDebugCB(ctx, dbgCallBack, NULL);
 
 	if((r = ee_intDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
-		snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: \n", r);
+		cstr = es_str2cstr(errmsg, NULL);
+		snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: %s\n",
+			 r, cstr);
+		free(cstr);
 		errout(errbuf);
 	}
 
