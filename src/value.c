@@ -49,6 +49,7 @@ done:
 void
 ee_deleteValue(struct ee_value *value)
 {
+	assert(value != NULL);
 	assert(value->objID == ObjID_VALUE);
 	free(value);
 }
@@ -57,8 +58,9 @@ ee_deleteValue(struct ee_value *value)
 int
 ee_setStrValue(struct ee_value *value, es_str_t *val)
 {
+	assert(value != NULL);
 	assert(value->objID == ObjID_VALUE);
-	assert(value->valtype = ee_valtype_none);
+	assert(value->valtype == ee_valtype_none);
 	value->valtype = ee_valtype_str;
 	value->val.str = val;
 	return 0;

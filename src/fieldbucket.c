@@ -83,8 +83,8 @@ int
 ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field)
 {
 	int r;
-	assert(fieldbucket->objID == ObjID_FIELDBUCKET);
-	assert(fieldbucket->objID == ObjID_FIELD);
+	assert(fieldbucket != NULL);assert(fieldbucket->objID == ObjID_FIELDBUCKET);
+	assert(field != NULL);assert(field->objID == ObjID_FIELD);
 	/* for the time being, we accept name "duplication" (it points to the same
 	 * string in any case, so that's not too bad...)
 	 */

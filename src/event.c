@@ -60,7 +60,7 @@ done:
 void
 ee_deleteEvent(struct ee_event *event)
 {
-	assert(event->objID == ObjID_EVENT);
+	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if(event->tags != NULL)
 		ee_deleteTagbucket(event->tags);
 	if(event->fields != NULL)
@@ -74,12 +74,29 @@ ee_addTagToEvent(struct ee_event *event, char *tag)
 {
 	int r = -1;
 
-	assert(event->objID == ObjID_EVENT);
+	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if(event->tags == NULL)
 		if((event->tags = ee_newTagbucket(event->ctx)) == NULL)
 			goto done;
 
 	r = ee_addTagToBucket(event->tags, strdup(tag));
+	
+done:
+	return r;
+}
+
+
+int
+ee_addFieldToEvent(struct ee_event *event, struct ee_field *field)
+{
+	int r;
+
+	assert(event != NULL);assert(event->objID == ObjID_EVENT);
+	if(event->fields == NULL) {
+		CHKN(event->fields = ee_newFieldbucket(event->ctx));
+	}
+
+	r = ee_addFieldToBucket(event->fields, field);
 	
 done:
 	return r;
@@ -93,7 +110,7 @@ ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 	struct ee_field *field = NULL;
 	struct ee_value *val = NULL;
 
-	assert(event->objID == ObjID_EVENT);
+	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if(event->fields == NULL)
 		if((event->fields = ee_newFieldbucket(event->ctx)) == NULL)
 			goto done;
@@ -148,7 +165,7 @@ ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
 
-	assert(event->objID == ObjID_EVENT);
+	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
 	xmlHashScan(event->fields->ht, IteratorRFC5424, str);

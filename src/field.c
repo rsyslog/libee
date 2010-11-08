@@ -64,7 +64,7 @@ struct ee_field*
 ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, struct ee_value *val)
 {
 	struct ee_field *field;
-	assert(val == ObjID_VALUE);
+	assert(val->objID == ObjID_VALUE);
 	if((field = ee_newField(ctx)) == NULL) goto done;
 
 	if((field->name = strdup(name)) == NULL) {
@@ -89,7 +89,7 @@ int
 ee_nameField(struct ee_field *field, es_str_t *name)
 {
 	int r;
-	assert(field == ObjID_FIELD);
+	assert(field->objID == ObjID_FIELD);
 	if(field->name != NULL) {
 		r = EE_FIELDHASNAME;
 		goto done;
@@ -107,8 +107,8 @@ ee_addValueToField(struct ee_field *field, struct ee_value *val)
 {
 	int r;
 	struct ee_valnode *valnode;
-	assert(field == ObjID_FIELD);
-	assert(val == ObjID_VALUE);
+	assert(field != NULL);assert(field->objID== ObjID_FIELD);
+	assert(val != NULL);assert(val->objID == ObjID_VALUE);
 
 	if(field->nVals == 0) {
 		field->nVals = 1;

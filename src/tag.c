@@ -58,7 +58,7 @@ done:
 void
 ee_deleteTag(struct ee_tag *tag)
 {
-	assert(tag->objID == ObjID_TAG);
+	assert(tag->o.objID == ObjID_TAG);
 	ee_deinitObj(&tag->o);
 	free(tag);
 }

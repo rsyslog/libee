@@ -94,6 +94,7 @@ AC_ARG_ENABLE(debug,
          esac],
         [enable_debug="no"]
 )
+AM_CONDITIONAL(ENABLE_DEBUG, test x$enable_debug = xyes)
 if test "$enable_debug" = "yes"; then
         AC_DEFINE(DEBUG, 1, [Defined if debug mode is enabled (it's easier to check in the code).])
 fi

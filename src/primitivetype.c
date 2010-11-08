@@ -106,7 +106,7 @@ size_t parse##ParserName(ee_ctx __attribute__((unused)) ctx, char **buf, size_t 
                       struct ee_value **newVal) \
 { \
 	size_t r = -1; \
-	assert(lenBuf > 0);
+	assert(*lenBuf > 0);
 
 #define ENDParser \
 	return r; \

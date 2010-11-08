@@ -46,7 +46,7 @@
  * a linked list.
  */
 struct ee_field {
-	int objID;		/**< magic number to identify the object */
+	unsigned objID;		/**< magic number to identify the object */
 	ee_ctx ctx;		/**< associated library context */
 	es_str_t *name;		/**< the field name */
 	unsigned short nVals;	/**< number of values 0..65535 */

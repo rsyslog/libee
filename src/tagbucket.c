@@ -70,7 +70,7 @@ deallocator(void *payload, xmlChar __attribute__((unused)) *name)
 void
 ee_deleteTagbucket(struct ee_tagbucket *tagbucket)
 {
-	assert(fieldbucket->objID == ObjID_TAGBUCKET);
+	assert(tagbucket->objID == ObjID_TAGBUCKET);
 	tagbucket->objID = ObjID_DELETED;
 	xmlHashFree(tagbucket->ht, deallocator);
 	free(tagbucket);

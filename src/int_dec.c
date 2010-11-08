@@ -79,8 +79,11 @@ static inline int
 finishField(struct ee_event *event, struct ee_field **field)
 {
 	int r;
-	CHKR(ee_addFieldToEvent(event, *field));
-	*field = NULL;
+printf("finishField 1\n");
+	if(*field != NULL) {
+		CHKR(ee_addFieldToEvent(event, *field));
+		*field = NULL;
+	}
 	r = 0;
 done:
 	return r;
@@ -99,34 +102,39 @@ processLn(ee_ctx ctx, char typ, es_str_t *value, struct ee_event **event,
           int (*cbNewEvt)(struct ee_event *event))
 {
 	int r;
+	struct ee_value *val;
 
 	switch(typ) {
 	case '#':
 		/* comment - ignore */
 		break;
 	case 'e':
-		CHKR(finishField(*event, field));
+printf("type event\n");
 		if(*event != NULL) {
+			CHKR(finishField(*event, field));
 			CHKR(cbNewEvt(*event));
 		}
 		CHKN(*event = ee_newEvent(ctx));
 		break;
 	case 'f':
+printf("type field\n");
 		if(*event == NULL) {
 			r = EE_INVLDFMT;
 			goto done;
 		}
 		CHKR(finishField(*event, field));
-		if((*field = ee_newField(ctx)) == NULL) {
-			r = EE_NOMEM;
-			goto done;
-		}
+		CHKN(*field = ee_newField(ctx));
+		CHKR(ee_nameField(*field, value));
 		break;
 	case 'v':
+printf("type value\n");
 		if(*field == NULL) {
 			r = EE_INVLDFMT;
 			goto done;
 		}
+		CHKN(val = ee_newValue(ctx));
+		CHKR(ee_setStrValue(val, value));
+		CHKR(ee_addValueToField(*field, val));
 		break;
 	}
 	r = 0;
@@ -168,6 +176,15 @@ ee_intDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 		}
 		r = cbGetLine(&ln);
 		lnNbr++;
+	}
+	/* when we are done with the file, we need to check if there are
+	 * any objects to submit (usually there are!)
+	 */
+	if(event != NULL) {
+		if(field != NULL) {
+			CHKR(finishField(event, &field));
+		}
+		CHKR(cbNewEvt(event));
 	}
 
 	if(r == EE_EOF)
