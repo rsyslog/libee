@@ -171,6 +171,8 @@
 #define EE_NOMEM -2
 #define EE_EOF -3
 #define EE_INVLDFMT -4
+#define EE_FIELDHASNAME -5
+#define EE_TOOMANYVALUES -6
 
 /* TODO: move this to an internal header file! for source only! */
 #define CHKR(x) \

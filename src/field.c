@@ -45,6 +45,9 @@ ee_newField(ee_ctx ctx)
 	if((field = malloc(sizeof(struct ee_field))) == NULL) goto done;
 	field->objID = ObjID_FIELD;
 	field->ctx = ctx;
+	field->name = NULL;
+	field->nVals = 0;
+	field->valroot = field->valtail = NULL;
 done:
 	return field;
 }
@@ -57,11 +60,6 @@ ee_deleteField(struct ee_field *field)
 	free(field);
 }
 
-/* In this version of the method, we simply create a copy of the field name. In
- * later versions, depending on our state and compliance level, we may use
- * a pointer to an in-memory representation of the dictionary entity instead.
- * rgerhards, 2010-10-26
- */
 struct ee_field*
 ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, struct ee_value *val)
 {
@@ -81,3 +79,55 @@ done:
 	return field;
 }
 
+
+/* In this version of the method, we simply create a copy of the field name. In
+ * later versions, depending on our state and compliance level, we may use
+ * a pointer to an in-memory representation of the dictionary entity instead.
+ * rgerhards, 2010-10-26
+ */
+int
+ee_nameField(struct ee_field *field, es_str_t *name)
+{
+	int r;
+	assert(field == ObjID_FIELD);
+	if(field->name != NULL) {
+		r = EE_FIELDHASNAME;
+		goto done;
+	}
+	CHKN(field->name = es_strdup(name));
+	r = 0;
+done:
+	return r;
+}
+
+
+/* TODO: permit list, we currently support a single value only */
+int
+ee_addValueToField(struct ee_field *field, struct ee_value *val)
+{
+	int r;
+	struct ee_valnode *valnode;
+	assert(field == ObjID_FIELD);
+	assert(val == ObjID_VALUE);
+
+	if(field->nVals == 0) {
+		field->nVals = 1;
+		field->val = val;
+	} else if(field->nVals == 65353) {
+		r = EE_TOOMANYVALUES;
+		goto done;
+	} else {
+		/* we need to add to the list of values */
+		CHKN(valnode = ee_newValnode());
+		++field->nVals;
+		if(field->valtail == NULL) {
+			field->valroot = field->valtail = valnode;
+		} else {
+			field->valtail->next = valnode;
+			field->valtail = valnode;
+		}
+	}
+	r = 0;
+done:
+	return r;
+}
