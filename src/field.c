@@ -1,6 +1,6 @@
 /**
- * @file nvfield.c
- * Implements nvfield object methods.
+ * @file field.c
+ * Implements field object methods.
  *//* Libee - An Event Expression Library inspired by CEE
  * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
  *
@@ -33,43 +33,51 @@
 #define ERR_ABORT {r = 1; goto done; }
 
 #define CHECK_FIELD \
-	if(nvfield->objID != ObjID_NVFIELD) { \
+	if(field->objID != ObjID_FIELD) { \
 		r = -1; \
 		goto done; \
 	}
 
+struct ee_field*
+ee_newField(ee_ctx ctx)
+{
+	struct ee_field *field;
+	if((field = malloc(sizeof(struct ee_field))) == NULL) goto done;
+	field->objID = ObjID_FIELD;
+	field->ctx = ctx;
+done:
+	return field;
+}
+
+
+void
+ee_deleteField(struct ee_field *field)
+{
+	assert(field->objID == ObjID_FIELD);
+	free(field);
+}
 
 /* In this version of the method, we simply create a copy of the field name. In
  * later versions, depending on our state and compliance level, we may use
  * a pointer to an in-memory representation of the dictionary entity instead.
  * rgerhards, 2010-10-26
  */
-struct ee_nvfield*
-ee_newNVField(ee_ctx __attribute__((unused)) ctx, char *name, union ee_value *val)
+struct ee_field*
+ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, union ee_value *val)
 {
-	struct ee_nvfield *nvfield;
+	struct ee_field *field;
 	assert(val == ObjID_VALUE);
-	if((nvfield = malloc(sizeof(struct ee_nvfield))) == NULL)
-		goto done;
+	if((field = ee_newField(ctx)) == NULL) goto done;
 
-	if((nvfield->name = strdup(name)) == NULL) {
-		free(nvfield);
-		nvfield = NULL;
+	if((field->name = strdup(name)) == NULL) {
+		free(field);
+		field = NULL;
 		goto done;
 	}
 
-	nvfield->objID = ObjID_NVFIELD;
-	nvfield->ctx = ctx;
-	nvfield->val = val;
+	field->val = val;
 
 done:
-	return nvfield;
+	return field;
 }
 
-
-void
-ee_deleteNVField(struct ee_nvfield *nvfield)
-{
-	assert(nvfield->objID == ObjID_NVFIELD);
-	free(nvfield);
-}

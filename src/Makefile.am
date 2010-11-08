@@ -19,9 +19,10 @@ libee_la_SOURCES = \
 	event.c \
 	value.c \
 	tagbucket.c \
-	nvfield.c \
+	field.c \
 	fieldbucket.c \
-	primitivetype.c
+	primitivetype.c \
+	int_dec.c
 
 libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS)

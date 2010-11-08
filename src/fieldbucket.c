@@ -65,7 +65,7 @@ done:
 static void
 deallocator(void *payload, xmlChar __attribute__((unused)) *name)
 {
-	ee_deleteNVField((struct ee_nvfield*) payload);
+	ee_deleteField((struct ee_field*) payload);
 }
 
 
@@ -80,15 +80,15 @@ ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket)
 
 
 int
-ee_addNVFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_nvfield *nvfield)
+ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field)
 {
 	int r;
 	assert(fieldbucket->objID == ObjID_FIELDBUCKET);
-	assert(fieldbucket->objID == ObjID_NVFIELD);
+	assert(fieldbucket->objID == ObjID_FIELD);
 	/* for the time being, we accept name "duplication" (it points to the same
 	 * string in any case, so that's not too bad...)
 	 */
-	r = xmlHashAddEntry(fieldbucket->ht, (xmlChar*) nvfield->name, nvfield);
+	r = xmlHashAddEntry(fieldbucket->ht, (xmlChar*) field->name, field);
 	return r;
 }
 

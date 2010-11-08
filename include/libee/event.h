@@ -95,7 +95,7 @@ int ee_addTagToEvent(struct ee_event *event, char *tag);
  * @memberof ee_event
  * @public
  *
- * @param event event where nvfield shall be added
+ * @param event event where field shall be added
  * @param[in] fieldname Name of the field to be added. The field name must \b not
  *                  already exist inside the fieldbucket. Libee will copy
  *                  the field name, so the caller must free it itself if required.
@@ -104,6 +104,20 @@ int ee_addTagToEvent(struct ee_event *event, char *tag);
  * @return	0 on success, something else otherwise.
  */
 int ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value);
+
+
+/**
+ * Add an already constructed field to the event. 
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event where field shall be added
+ * @param[in] field field to be added
+ *
+ * @return	0 on success, something else otherwise.
+ */
+int ee_addFieldToEvent(struct ee_event *event, struct ee_field *field);
 
 
 /**

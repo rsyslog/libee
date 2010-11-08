@@ -67,17 +67,17 @@ void ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket);
 
 
 /**
- * Add a nvfield to the bucket.
+ * Add a field to the bucket.
  *
  * @memberof ee_tagbucket
  * @public
  *
  * @param[in] bucket	the bucket to modify
- * @param[in] nvfield	nvfield to be added
+ * @param[in] field	field to be added
  *
  * @return 0 on success, something else otherwise
  */
-int ee_addNVFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_nvfield *nvfield);
+int ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field);
 
 
 #endif /* #ifndef LIBEE_FIELDBUCKET_H_INCLUDED */

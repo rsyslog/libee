@@ -30,7 +30,7 @@
 #include <libestr.h>
 
 #include "libee/libee.h"
-#include "libee/nvfield.h"
+#include "libee/field.h"
 #include "libee/value.h"
 
 #define ERR_ABORT {r = 1; goto done; }
@@ -90,7 +90,7 @@ int
 ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 {
 	int r = -1;
-	struct ee_nvfield *nvfield = NULL;
+	struct ee_field *field = NULL;
 	union ee_value *val = NULL;
 
 	assert(event->objID == ObjID_EVENT);
@@ -101,28 +101,21 @@ ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 
 	if((val = ee_newValue(event->ctx)) == NULL) goto done;
 	if((r = ee_setStrValue(val, value)) != 0) goto done;
-	if((nvfield = ee_newNVField(event->ctx, fieldname, val)) == NULL) goto done;
-	if((r = ee_addNVFieldToBucket(event->fields, nvfield)) != 0) goto done;
+	if((field = ee_newFieldFromNV(event->ctx, fieldname, val)) == NULL) goto done;
+	if((r = ee_addFieldToBucket(event->fields, field)) != 0) goto done;
 
 done:
 	if(r != 0) {
 		/* central error cleanup */
 		if(val != NULL)
 			ee_deleteValue(val);
-		if(nvfield != NULL)
-			ee_deleteNVField(nvfield);
+		if(field != NULL)
+			ee_deleteField(field);
 	}
 
 	return r;
 }
 
-
-/* TODO: create much more solid code. This here is a HACK! */
-static void copy2String(char *str, size_t *offs, char *toAdd)
-{
-	strcpy(str+*offs, toAdd);
-	*offs = strlen(str);
-}
 
 /* callback used to build the strings */
 static void IteratorRFC5424(void __attribute__((unused)) *payload,
@@ -132,13 +125,13 @@ static void IteratorRFC5424(void __attribute__((unused)) *payload,
 	es_str_t **str = (es_str_t**) data;
 
 	char *cstr;
-	cstr = es_str2cstr(((struct ee_nvfield*) payload)->val->str, NULL);
+	cstr = es_str2cstr(((struct ee_field*) payload)->val->str, NULL);
 //printf("name=%s, value=%s\n", name, cstr);
 	free(cstr);
 	es_addChar(str, ' ');
 	es_addBuf(str, (char*)name, strlen((char*)name));
 	es_addBuf(str, "=\"", 2);
-	es_addStr(str, ((struct ee_nvfield*) payload)->val->str);
+	es_addStr(str, ((struct ee_field*) payload)->val->str);
 	es_addChar(str, '\"');
 }
 /* TODO: do a *real* implementation. The code below is just a

@@ -360,7 +360,7 @@ BEGINParser(Number)
 		goto fail;
 
 	if((*newVal = malloc(sizeof(union ee_value))) == NULL) {
-		r = E_NOMEM;
+		r = EE_NOMEM;
 		goto fail;
 	}
 

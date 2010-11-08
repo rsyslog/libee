@@ -168,5 +168,17 @@
 /* some private error codes (always negative)
  */
 #define E_ERR -1
-#define E_NOMEM -2
+#define EE_NOMEM -2
+#define EE_EOF -3
+#define EE_INVLDFMT -4
+
+/* TODO: move this to an internal header file! for source only! */
+#define CHKR(x) \
+	if((r = (x)) != 0) goto done
+
+#define CHKN(x) \
+	if((x) == NULL) { \
+		r = EE_NOMEM; \
+		goto done; \
+	}
 #endif /* #ifndef EE_H_INCLUDED */

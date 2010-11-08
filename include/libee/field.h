@@ -1,6 +1,6 @@
 /**
  * @file field.h
- * @brief The CEE field object.
+ * @brief The CEE nvfield object.
  * @class ee_field field.h
  *
  *//*
@@ -30,13 +30,20 @@
 #define	LIBEE_FIELD_H_INCLUDED
 
 /**
- * The CEE Field object.
- * @extends ee_obj
+ * The Field object.
+ *
+ * Note that in CEE terms, this is called a "nvfield". 
+ *
+ * This represents a name-value pair, whereby the name should correspond
+ * to a valid field type. However, depending on compliance level, name
+ * may not point to a valid field. For this reason, we do not require
+ * a pointer to the proper field definition.
  */
 struct ee_field {
-	struct ee_obj o;	/*<< the base object */
-	struct ee_tagset *fromTagSet;
-	struct ee_fieldset *fieldSet;
+	int objID;		/**< magic number to identify the object */
+	ee_ctx ctx;		/**< associated library context */
+	char	*name;		/**< the field name */
+	union ee_value *val;	/**< value assigned to this field */
 };
 
 /**
@@ -45,15 +52,35 @@ struct ee_field {
  * @memberof ee_field
  * @public
  *
- * @return new library context or NULL if an error occured
+ * @param[in] ctx library context
+ *
+ * @return pointer to new object or NULL if an error occured
  */
-struct ee_field* ee_newField(void);
+struct ee_field* ee_newField(ee_ctx ctx);
+
+
+/**
+ * Constructor an ee_field object from a name value pair.
+ * TODO: is this legacy or do we need it in the future?
+ *
+ * @memberof ee_field
+ * @public
+ *
+ * @param[in] ctx library context
+ * @param[in] name field name
+ * @param[in] val value
+ *
+ * @return new field or NULL if an error occured
+ */
+struct ee_field* ee_newFieldFromNV(ee_ctx ctx, char *name, union ee_value *val);
 
 /**
  * Destructor for the ee_field object.
  *
  * @memberof ee_field
  * @public
+ *
+ * @param[in] field object to be destructed
  *
  * @param field The field to be discarded.
  */
