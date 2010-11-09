@@ -37,6 +37,7 @@
 static ee_ctx ctx;
 static FILE *fpIn;
 static int verbose = 0;
+static enum { f_syslog, f_json } outfmt = f_syslog;
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -58,7 +59,14 @@ static int cbNewEvt(struct ee_event *event)
 {
 	es_str_t *out;
 
-	ee_fmtEventToRFC5424(event, &out);
+	switch(outfmt) {
+	case f_syslog:
+		ee_fmtEventToRFC5424(event, &out);
+		break;
+	case f_json:
+		ee_fmtEventToJSON(event, &out);
+		break;
+	}
 	printf("Formatted event: '%s'\n", es_str2cstr(out, NULL));
 	es_deleteStr(out);
 
@@ -103,7 +111,7 @@ int main(int argc, char *argv[])
 	char errbuf[1024];
 
 	fpIn = stdin;
-	while((opt = getopt(argc, argv, "i:v")) != -1) {
+	while((opt = getopt(argc, argv, "i:vo:")) != -1) {
 		switch (opt) {
 		case 'i':
 			if((fpIn = fopen(optarg, "r")) == NULL) {
@@ -113,6 +121,11 @@ int main(int argc, char *argv[])
 			break;
 		case 'v':
 			verbose = 1;
+			break;
+		case 'o':
+			if(!strcmp(optarg, "json")) {
+				outfmt = f_json;
+			}
 			break;
 		default:
 			printf("invalid option '%c' or value missing - "

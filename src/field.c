@@ -131,30 +131,3 @@ ee_addValueToField(struct ee_field *field, struct ee_value *val)
 done:
 	return r;
 }
-
-
-int
-ee_addField_Syslog(struct ee_field *field, es_str_t **str)
-{
-	int r;
-	struct ee_valnode *valnode;
-
-	assert(field != NULL);assert(field->objID== ObjID_FIELD);
-	assert(str != NULL); assert(*str != NULL);
-	CHKR(es_addStr(str, field->name));
-	CHKR(es_addBuf(str, "=\"", 2));
-	if(field->nVals > 0) {
-		CHKR(ee_addValue_Syslog(field->val, str));
-		if(field->nVals > 1) {
-			for(valnode = field->valroot ; valnode != NULL ; valnode = valnode->next) {
-				CHKR(es_addChar(str, ','));
-				CHKR(ee_addValue_Syslog(valnode->val, str));
-			}
-		}
-	}
-	CHKR(es_addChar(str, '\"'));
-	r = 0;
-
-done:
-	return r;
-}

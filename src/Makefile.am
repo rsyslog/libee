@@ -26,7 +26,9 @@ libee_la_SOURCES = \
 	field.c \
 	fieldbucket.c \
 	primitivetype.c \
-	int_dec.c
+	int_dec.c \
+	syslog_enc.c \
+	json_enc.c
 
 libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS)
