@@ -37,7 +37,7 @@
 static ee_ctx ctx;
 static FILE *fpIn;
 static int verbose = 0;
-static enum { f_syslog, f_json } outfmt = f_syslog;
+static enum { f_all, f_syslog, f_json } outfmt = f_syslog;
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -62,12 +62,23 @@ static int cbNewEvt(struct ee_event *event)
 	switch(outfmt) {
 	case f_syslog:
 		ee_fmtEventToRFC5424(event, &out);
+		printf("%s\n", es_str2cstr(out, NULL));
+		//TODO: fix es_deleteStr(out);
 		break;
 	case f_json:
 		ee_fmtEventToJSON(event, &out);
+		printf("%s\n", es_str2cstr(out, NULL));
+		//es_deleteStr(out);
+		break;
+	case f_all:
+		ee_fmtEventToRFC5424(event, &out);
+		printf("syslog: %s\n", es_str2cstr(out, NULL));
+		//es_deleteStr(out);
+		ee_fmtEventToJSON(event, &out);
+		printf("json..: %s\n", es_str2cstr(out, NULL));
+		//es_deleteStr(out);
 		break;
 	}
-	printf("Formatted event: '%s'\n", es_str2cstr(out, NULL));
 	es_deleteStr(out);
 
 	return 0;
@@ -125,6 +136,8 @@ int main(int argc, char *argv[])
 		case 'o':
 			if(!strcmp(optarg, "json")) {
 				outfmt = f_json;
+			} else if(!strcmp(optarg, "all")) {
+				outfmt = f_all;
 			}
 			break;
 		default:

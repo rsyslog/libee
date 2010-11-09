@@ -32,13 +32,29 @@
 #include <libxml/hash.h>
 
 /**
+ * Internal structure to represent linked list nodes for the fieldbucket.
+ */
+struct ee_fieldbucket_listnode {
+	struct ee_field *field;
+	struct ee_fieldbucket_listnode *next;
+};
+
+/**
  * The fieldbucket object, a container to store fields and their values.
+ * Note that fields are stored inside a linked list in the field bucket.
+ * This is good to preserve sequence and easily iterate over them, but
+ * it does not offer good performance for random access. For the time
+ * being, we do not have any random access at all, so we ignore this issue.
+ * However, the cure is simple: as soon as we need random access, we add
+ * a hashtable, and store key/pointer to listnode (or so) in it. That
+ * way, we have some overhead, but otherwise the best of both worlds.
  */
 struct ee_fieldbucket {
 	unsigned objID;
 		/**< a magic number to prevent some memory adressing errors */
 	ee_ctx ctx;		/**< associated library context */
-	xmlHashTablePtr ht;	/**< this *is* the actual bucket ;) */
+	struct ee_fieldbucket_listnode *root; /**< root of our field list */
+	struct ee_fieldbucket_listnode *tail; /**< list tail to speed up adding nodes */
 };
 
 /**

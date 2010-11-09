@@ -118,33 +118,21 @@ done:
 }
 
 
-/* callback used to build the strings */
-static void IteratorRFC5424(void *payload, void *data,
-				   xmlChar __attribute__((unused)) *name)
-{
-	struct ee_field *field = (struct ee_field*) payload;
-	es_str_t **str = (es_str_t**) data;
-
-	assert(field->objID == ObjID_FIELD);
-	es_addChar(str, ' ');
-	ee_addField_Syslog(field, str);
-}
-/* Note: for efficiency reasons, we "break up" the object model a bit
- * here: In order to avoid inefficiency when calling the hashScan function,
- * I iterate over the hash table holding the fields here. Note that this
- * object here should *not* know it is actually dealing with a hash table.
- * rgerhards, 2010-10-27
- */
 int
 ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
+	struct ee_fieldbucket_listnode *node;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
 	es_addBuf(str, "[cee@...", 8);
-	xmlHashScan(event->fields->ht, IteratorRFC5424, str);
+	for(node = event->fields->root ; node != NULL ; node = node->next) {
+		assert(node->field->objID == ObjID_FIELD);
+		es_addChar(str, ' ');
+		ee_addField_Syslog(node->field, str);
+	}
 	es_addChar(str, ']');
 
 done:

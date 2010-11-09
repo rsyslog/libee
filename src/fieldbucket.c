@@ -48,24 +48,10 @@ ee_newFieldbucket(ee_ctx ctx)
 
 	fieldbucket->objID = ObjID_FIELDBUCKET;
 	fieldbucket->ctx = ctx;
-	if((fieldbucket->ht = xmlHashCreate(ctx->fieldBucketSize)) == NULL) {
-		free(fieldbucket);
-		fieldbucket = NULL;
-		goto done;
-	}
+	fieldbucket->root = fieldbucket->tail = NULL;
 
 done:
 	return fieldbucket;
-}
-
-
-
-/* deallocator for freeing hash table content
- */
-static void
-deallocator(void *payload, xmlChar __attribute__((unused)) *name)
-{
-	ee_deleteField((struct ee_field*) payload);
 }
 
 
@@ -74,50 +60,31 @@ ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket)
 {
 	assert(fieldbucket->objID == ObjID_FIELDBUCKET);
 	fieldbucket->objID = ObjID_DELETED;
-	xmlHashFree(fieldbucket->ht, deallocator);
+	// TODO: free list (memleak!)
 	free(fieldbucket);
 }
 
 
+/* TODO: when in validating mode, check duplicate field entries */
 int
-ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field)
+ee_addFieldToBucket(struct ee_fieldbucket *fieldb, struct ee_field *field)
 {
 	int r;
-	assert(fieldbucket != NULL);assert(fieldbucket->objID == ObjID_FIELDBUCKET);
+	struct ee_fieldbucket_listnode *node;
+	assert(fieldb != NULL);assert(fieldb->objID == ObjID_FIELDBUCKET);
 	assert(field != NULL);assert(field->objID == ObjID_FIELD);
-	/* for the time being, we accept name "duplication" (it points to the same
-	 * string in any case, so that's not too bad...)
-	 */
-	char *name;
-	name = es_str2cstr(field->name, NULL);
-	r = xmlHashAddEntry(fieldbucket->ht, (xmlChar*) name, field);
+
+	CHKN(node = malloc(sizeof(struct ee_fieldbucket_listnode)));
+	node->field = field;
+	node->next = NULL;
+	if(fieldb->root == NULL) {
+		fieldb->root = fieldb->tail = node;
+	} else {
+		fieldb->tail->next = node;
+		fieldb->tail = node;
+	}
+	r = 0;
+
+done:
 	return r;
-}
-
-
-/* we can pass only one pointer to libxml2, so we unfortunately
- * need to set up a structure for the two parameters we have.
- */
-struct ptr_IteratoroverFieldTags {
-	void (*f)(void *, char*);
-	void *cookie;
-};
-static void IteratorOverFieldTags(void __attribute__((unused)) *payload,
-				   void __attribute__((unused)) *data,
-				   xmlChar *name)
-{
-	struct ptr_IteratoroverFieldTags *iter = (struct ptr_IteratoroverFieldTags*) data;
-	iter->f(iter->cookie, (char*)name);
-}
-
-
-void
-ee_iterateOverFieldTags(struct ee_fieldbucket *fieldbucket,
-			 void(*f)(void*, char*), void *cookie)
-{
-	static struct ptr_IteratoroverFieldTags iter;
-	assert(f != NULL);
-	iter.f = f;
-	iter.cookie = cookie;
-	xmlHashScan(fieldbucket->ht, IteratorOverFieldTags, &iter);
 }

@@ -36,14 +36,27 @@
 
 #include "libee/libee.h"
 
+static char hexdigit[16] =
+	{'0', '1', '2', '3', '4', '5', '6', '7', '8',
+	 '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
+/* TODO: JSON encoding for Unicode characters is as of RFC4627 not fully
+ * supported. The algorithm is that we must build the wide character from
+ * UTF-8 (if char > 127) and build the full 4-octet Unicode character out
+ * of it. Then, this needs to be encoded. Currently, we work on a
+ * byte-by-byte basis, which simply is incorrect.
+ * rgerhards, 2010-11-09
+ */
 int
 ee_addValue_JSON(struct ee_value *value, es_str_t **str)
 {
 	int r;
 	es_str_t *valstr;
-	unsigned char *c;
+	unsigned char *buf;
+	unsigned char c;
 	size_t i;
+	char numbuf[4];
+	int j;
 
 	assert(str != NULL); assert(*str != NULL);
 	assert(value != NULL); assert(value->objID == ObjID_VALUE);
@@ -52,28 +65,55 @@ ee_addValue_JSON(struct ee_value *value, es_str_t **str)
 	valstr = value->val.str;
 	es_addChar(str, '\"');
 
-	c = es_getBufAddr(valstr);
+	buf = es_getBufAddr(valstr);
 	for(i = 0 ; i < es_strlen(valstr) ; ++i) {
-		switch(c[i]) {
-		case '\0':
-			es_addBuf(str, "\\u0000", 6);
-			break;
-		case '\"':
-			es_addBuf(str, "\\\"", 2);
-			break;
-		case '/':
-			es_addBuf(str, "\\/", 2);
-			break;
-		case '\\':
-			es_addBuf(str, "\\\\", 2);
-			break;
-		case '\n':
-			es_addBuf(str, "\\n", 2);
-			break;
-		/* TODO : add rest of control characters here... */
-		default:
-			es_addChar(str, c[i]);
-			break;
+		c = buf[i];
+		if(   (c >= 0x23 && c <= 0x5b)
+		   || (c >= 0x5d /* && c <= 0x10FFFF*/)
+		   || c == 0x20 || c == 0x21) {
+			/* no need to escape */
+//printf("no need to escape %2.2x\n", c);
+			es_addChar(str, c);
+		} else {
+			/* we must escape, try RFC4627-defined special sequences first */
+			switch(c) {
+			case '\0':
+				es_addBuf(str, "\\u0000", 6);
+				break;
+			case '\"':
+				es_addBuf(str, "\\\"", 2);
+				break;
+			case '/':
+				es_addBuf(str, "\\/", 2);
+				break;
+			case '\\':
+				es_addBuf(str, "\\\\", 2);
+				break;
+			case '\010':
+				es_addBuf(str, "\\b", 2);
+				break;
+			case '\014':
+				es_addBuf(str, "\\f", 2);
+				break;
+			case '\n':
+				es_addBuf(str, "\\n", 2);
+				break;
+			case '\r':
+				es_addBuf(str, "\\r", 2);
+				break;
+			case '\t':
+				es_addBuf(str, "\\t", 2);
+				break;
+			default:
+				/* TODO : proper Unicode encoding (see header comment) */
+				for(j = 0 ; j < 4 ; ++j) {
+					numbuf[3-j] = hexdigit[c % 16];
+					c = c / 16;
+				}
+				es_addBuf(str, "\\u", 2);
+				es_addBuf(str, numbuf, 4);
+				break;
+			}
 		}
 	}
 	es_addChar(str, '\"');
@@ -112,35 +152,23 @@ done:
 }
 
 
-/* callback used to build the strings */
-static void IteratorRFC5424(void *payload, void *data,
-				   xmlChar __attribute__((unused)) *name)
-{
-	struct ee_field *field = (struct ee_field*) payload;
-	es_str_t **str = (es_str_t**) data;
-
-	assert(field->objID == ObjID_FIELD);
-	es_addChar(str, ' ');
-	ee_addField_JSON(field, str);
-	es_addChar(str, ',');
-}
-/* Note: for efficiency reasons, we "break up" the object model a bit
- * here: In order to avoid inefficiency when calling the hashScan function,
- * I iterate over the hash table holding the fields here. Note that this
- * object here should *not* know it is actually dealing with a hash table.
- * rgerhards, 2010-10-27
- */
 int
 ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
+	struct ee_fieldbucket_listnode *node;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
-	es_addBuf(str, "{", 8);
-	xmlHashScan(event->fields->ht, IteratorRFC5424, str);
-	es_addChar(str, (unsigned char) '}');
+	es_addChar(str, '{');
+	for(node = event->fields->root ; node != NULL ; node = node->next) {
+		assert(node->field->objID == ObjID_FIELD);
+		ee_addField_JSON(node->field, str);
+		if(node->next != NULL)
+			es_addBuf(str, ", ", 2);
+	}
+	es_addChar(str, '}');
 
 done:
 	return r;
