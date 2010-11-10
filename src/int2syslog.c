@@ -118,35 +118,10 @@ int main(int argc, char *argv[])
 	int r;
 	int opt;
 	es_str_t *errmsg;
-	unsigned char *cstr;
+	char *cstr;
 	char errbuf[1024];
 
 	fpIn = stdin;
-	while((opt = getopt(argc, argv, "i:vo:")) != -1) {
-		switch (opt) {
-		case 'i':
-			if((fpIn = fopen(optarg, "r")) == NULL) {
-				perror(optarg);
-				exit(1);
-			}
-			break;
-		case 'v':
-			verbose = 1;
-			break;
-		case 'o':
-			if(!strcmp(optarg, "json")) {
-				outfmt = f_json;
-			} else if(!strcmp(optarg, "all")) {
-				outfmt = f_all;
-			}
-			break;
-		default:
-			printf("invalid option '%c' or value missing - "
-			       "terminating...\n", opt);
-			exit (1);
-			break;
-		}
-	}
 
 	if(strcmp(VERSION, ee_version())) {
 		sprintf(errbuf, "loaded library version %s does not match "
@@ -158,6 +133,37 @@ int main(int argc, char *argv[])
 		errout("Could not initialize libee context");
 	}
 	ee_setDebugCB(ctx, dbgCallBack, NULL);
+
+	while((opt = getopt(argc, argv, "c:i:vo:")) != -1) {
+		switch (opt) {
+		case 'i':
+			if((fpIn = fopen(optarg, "r")) == NULL) {
+				perror(optarg);
+				exit(1);
+			}
+			break;
+		case 'v':
+			verbose = 1;
+			break;
+		case 'o': /* output format */
+			if(!strcmp(optarg, "json")) {
+				outfmt = f_json;
+			} else if(!strcmp(optarg, "all")) {
+				outfmt = f_all;
+			}
+			break;
+		case 'c': /* compactness of encoding */
+			if(!strcmp(optarg, "ultra")) {
+				ee_setEncUltraCompact(ctx);
+			}
+			break;
+		default:
+			printf("invalid option '%c' or value missing - "
+			       "terminating...\n", opt);
+			exit (1);
+			break;
+		}
+	}
 
 	if((r = ee_intDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
 		cstr = es_str2cstr(errmsg, NULL);

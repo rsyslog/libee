@@ -133,10 +133,20 @@ ee_addField_JSON(struct ee_field *field, es_str_t **str)
 	assert(str != NULL); assert(*str != NULL);
 	CHKR(es_addChar(str, '\"'));
 	CHKR(es_addStr(str, field->name));
-	CHKR(es_addBuf(str, "\": ", 3));
-	if(field->nVals == 1) {
+	if(ee_ctxIsEncUltraCompact(field->ctx)) {
+		CHKR(es_addBuf(str, "\":", 2));
+	} else {
+		CHKR(es_addBuf(str, "\": ", 3));
+	}
+	if(field->nVals == 0) {
+		if(ee_ctxIsEncUltraCompact(field->ctx)) {
+			CHKR(es_addChar(str, '\"'));
+		} else {
+			CHKR(es_addBuf(str, "\"\"", 2));
+		}
+	} else if(field->nVals == 1) {
 		CHKR(ee_addValue_JSON(field->val, str));
-	} else if(field->nVals > 1) {
+	} else { /* we have multiple values --> array */
 		CHKR(es_addChar(str, '['));
 		CHKR(ee_addValue_JSON(field->val, str));
 		for(valnode = field->valroot ; valnode != NULL ; valnode = valnode->next) {
@@ -166,7 +176,7 @@ ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 		assert(node->field->objID == ObjID_FIELD);
 		ee_addField_JSON(node->field, str);
 		if(node->next != NULL)
-			es_addBuf(str, ", ", 2);
+			es_addBuf(str, ", ", ee_ctxIsEncUltraCompact(event->ctx) ? 1 : 2);
 	}
 	es_addChar(str, '}');
 

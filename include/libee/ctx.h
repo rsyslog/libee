@@ -62,6 +62,7 @@ enum ee_compLevel {
 	ee_cl_FULL	/**< full verification is required */
 };
 
+#define EE_CTX_FLAG_ENC_ULTRACOMPACT 1
 
 struct ee_ctx_s {
 	unsigned objID;	/**< a magic number to prevent some memory adressing errors */
@@ -69,6 +70,7 @@ struct ee_ctx_s {
 					/**< user-provided debug output callback */
 	void *dbgCookie;		/**< cookie to be passed to debug callback */
 	enum ee_compLevel compLevel;	/**< our compliance level */
+	unsigned short flags;		/**< flags modifying behavior */
 	int fieldBucketSize;		/**< default size for field buckets */
 	int tagBucketSize;		/**< default size for field buckets */
 };
@@ -126,6 +128,23 @@ ee_ctx ee_initCtx(void);
 int ee_exitCtx(ee_ctx ctx);
 
 /**
+ * Set encoding mode to ultra compact.
+ * In this mode the encoders will generated the shortest
+ * string presentation possible, even if that means it will
+ * be very hard to read by a human.
+ *
+ * @memberof ee_ctx
+ * @public
+ *
+ * @param ctx context to modify
+ */
+static inline void
+ee_setEncUltraCompact(ee_ctx ctx)
+{
+	ctx->flags |= EE_CTX_FLAG_ENC_ULTRACOMPACT;
+}
+
+/**
  * Set a debug message handler (callback).
  *
  * Libee can provide helpful information for debugging
@@ -164,5 +183,11 @@ int ee_setDebugCB(ee_ctx ctx, void (*cb)(void*, char*, size_t), void *cookie);
 
 /* internal functions */
 void ee_dbgprintf(ee_ctx ctx, char *fmt, ...) __attribute__((format(printf, 2, 3)));
+
+static inline int
+ee_ctxIsEncUltraCompact(ee_ctx ctx)
+{
+	return ctx->flags & EE_CTX_FLAG_ENC_ULTRACOMPACT;
+}
 
 #endif /* #ifndef LIBEE_EE_H_INCLUDED */
