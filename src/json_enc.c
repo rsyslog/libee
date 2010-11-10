@@ -72,7 +72,6 @@ ee_addValue_JSON(struct ee_value *value, es_str_t **str)
 		   || (c >= 0x5d /* && c <= 0x10FFFF*/)
 		   || c == 0x20 || c == 0x21) {
 			/* no need to escape */
-//printf("no need to escape %2.2x\n", c);
 			es_addChar(str, c);
 		} else {
 			/* we must escape, try RFC4627-defined special sequences first */

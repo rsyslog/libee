@@ -63,23 +63,22 @@ static int cbNewEvt(struct ee_event *event)
 	case f_syslog:
 		ee_fmtEventToRFC5424(event, &out);
 		printf("%s\n", es_str2cstr(out, NULL));
-		//TODO: fix es_deleteStr(out);
+		es_deleteStr(out);
 		break;
 	case f_json:
 		ee_fmtEventToJSON(event, &out);
 		printf("%s\n", es_str2cstr(out, NULL));
-		//es_deleteStr(out);
+		es_deleteStr(out);
 		break;
 	case f_all:
 		ee_fmtEventToRFC5424(event, &out);
 		printf("syslog: %s\n", es_str2cstr(out, NULL));
-		//es_deleteStr(out);
+		es_deleteStr(out);
 		ee_fmtEventToJSON(event, &out);
 		printf("json..: %s\n", es_str2cstr(out, NULL));
-		//es_deleteStr(out);
+		es_deleteStr(out);
 		break;
 	}
-	es_deleteStr(out);
 
 	return 0;
 }
