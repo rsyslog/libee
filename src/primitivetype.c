@@ -338,8 +338,6 @@ BEGINParser(RFC3164Date)
 	 * is the reason why the caller must pass in a correct timestamp.
 	 */
 	size_t usedLen =  orglen - len;
-printf("RFC3164 date parser: offs %u, len %u, usedLen %u\n", (unsigned) *offs, (unsigned) len,
-	(unsigned) usedLen);
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
 	*value = ee_newValue(ctx);
 	ee_setStrValue(*value, valstr);
@@ -360,31 +358,39 @@ fail:
 ENDParser
 
 
-#if 0
 /**
  * Parse a Number.
  * Note that a number is an abstracted concept. We always represent it
  * as 64 bits (but may later change our mind if performance dictates so).
  */
 BEGINParser(Number)
-	char *p = *buf;
-	size_t len = *lenBuf;
+	unsigned char *p;
+	size_t len, orglen;
 	long long n;
 
+
+printf("parseNumber got '%s'\n", es_str2cstr(str, NULL)+ *offs);
+	p = es_getBufAddr(str) + *offs;
+	orglen = len = es_strlen(str) - *offs;
+
 	n = hParseInt(&p, &len);
-	if(p == *buf)
+	if(p == es_getBufAddr(str))
 		goto fail;
 
-	if((*newVal = malloc(sizeof(struct ee_value))) == NULL) {
+	if((*value = ee_newValue(ctx)) == NULL) {
 		r = EE_NOMEM;
 		goto fail;
 	}
 
 	/* success, persist */
-	(*newVal)->valtype = ee_valtype_nbr;
-	(*newVal)->val.number = n;
-	*buf =p;
-	*lenBuf = len;
+	size_t usedLen =  orglen - len;
+printf("in parseNumber offs %u, usedLen %u, orglen %d, len %u\n", (int) *offs, (int)usedLen, (int)orglen, (int)len);
+	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
+	ee_setStrValue(*value, valstr);
+	*offs += usedLen;
+	r = 0;
+printf("in parseNumber offs %u, usedLen %u, orglen %d, len %u\n", (int) *offs, (int)usedLen, (int)orglen, (int)len);
+	//(*newVal)->valtype = ee_valtype_nbr;
+	//(*newVal)->val.number = n;
 fail:
 ENDParser
-#endif

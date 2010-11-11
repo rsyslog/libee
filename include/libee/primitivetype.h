@@ -71,4 +71,9 @@ void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
  */
 int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
 
+/** 
+ * Parser for numbers.
+ */
+int ee_parseNumber(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
+
 #endif /* #ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED */
