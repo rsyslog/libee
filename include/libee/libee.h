@@ -173,6 +173,7 @@
 #define EE_INVLDFMT -4
 #define EE_FIELDHASNAME -5
 #define EE_TOOMANYVALUES -6
+#define EE_WRONGPARSER -7
 
 /* TODO: move this to an internal header file! for source only! */
 #define CHKR(x) \

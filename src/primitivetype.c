@@ -100,15 +100,16 @@ hParseInt(unsigned char **buf, size_t *lenBuf)
  * create a nw ee_value (newVal) and store the obtained value into it
  * update buf and lenBuf to reflect the parsing carried out
  *
- * returns 0 on success and EE_WORNGPARSER if this parser could
+ * returns 0 on success and EE_WRONGPARSER if this parser could
  *           not successfully parse (but all went well otherwise) and something
  *           else in case of an error.
  */
+//int ee_parse##ParserName(es_str_t *str, size_t *offs, 
 #define BEGINParser(ParserName) \
 int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, size_t *offs, \
-                      struct ee_value **newVal) \
+                      struct ee_value **value) \
 { \
-	size_t r = -1;
+	size_t r = EE_WRONGPARSER;
 
 #define ENDParser \
 	return r; \
@@ -120,7 +121,7 @@ int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, size
  */
 BEGINParser(RFC3164Date)
 	unsigned char *p;
-	size_t len;
+	size_t len, orglen;
 	/* variables to temporarily hold time information while we parse */
 	int month;
 	int day;
@@ -132,7 +133,7 @@ BEGINParser(RFC3164Date)
 	assert(*offs < es_strlen(str));
 
 	p = es_getBufAddr(str) + *offs;
-	len = es_strlen(str) - *offs;
+	orglen = len = es_strlen(str) - *offs;
 	/* If we look at the month (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec),
 	 * we may see the following character sequences occur:
 	 *
@@ -295,8 +296,9 @@ BEGINParser(RFC3164Date)
 	if(hour > 1970 && hour < 2100) {
 		/* if so, we assume this actually is a year. This is a format found
 		 * e.g. in Cisco devices.
-		 */
+		 *
 		year = hour;
+		*/
 
 		/* re-query the hour, this time it must be valid */
 		if(len == 0 || *p++ != ' ')
@@ -335,9 +337,16 @@ BEGINParser(RFC3164Date)
 	 * fields we do not have are not updated in the caller's timestamp. This
 	 * is the reason why the caller must pass in a correct timestamp.
 	 */
-	*offs = (es_strlen(str) - *offs) - len;
-printf("RFC3164 date parser: offs %u, len %u\n", (unsigned) *offs, (unsigned) len);
-	r = 1; /* parsing was successful */
+	size_t usedLen =  orglen - len;
+printf("RFC3164 date parser: offs %u, len %u, usedLen %u\n", (unsigned) *offs, (unsigned) len,
+	(unsigned) usedLen);
+	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
+	*value = ee_newValue(ctx);
+	ee_setStrValue(*value, valstr);
+	*offs += usedLen;
+printf("RFC3164 date parser: offs %u, len %u, usedLen %u\n", (unsigned) *offs, (unsigned) len,
+	(unsigned) usedLen);
+	r = 0; /* parsing was successful */
 #if 0 /* TODO: see how we represent the actual timestamp */
 	pTime->month = month;
 	if(year > 0)
