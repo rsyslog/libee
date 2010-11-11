@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: ee
+Name: libee
 Description: event expression library, based on CEE ideas
 Version: @VERSION@
-Libs: -L${libdir} -lrelp @rt_libs@
+Libs: -L${libdir} @rt_libs@ -lee
 Cflags: -I${includedir}

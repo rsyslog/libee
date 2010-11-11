@@ -105,7 +105,7 @@ fi
 
 
 AC_CONFIG_FILES([Makefile \
-		ee.pc \
+		libee.pc \
 		src/Makefile \
 		include/Makefile \
 		include/libee/Makefile \
