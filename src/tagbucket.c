@@ -48,35 +48,23 @@ ee_newTagbucket(ee_ctx ctx)
 
 	tagbucket->objID = ObjID_TAGBUCKET;
 	tagbucket->ctx = ctx;
-	if((tagbucket->ht = xmlHashCreate(ctx->tagBucketSize)) == NULL) {
-		free(tagbucket);
-		tagbucket = NULL;
-		goto done;
-	}
+	tagbucket->root = tagbucket->tail = NULL;
 
-done:
-	return tagbucket;
+done:	return tagbucket;
 }
 
-
-
-/* deallocator for freeing hash table content
- */
-static void
-deallocator(void *payload, xmlChar __attribute__((unused)) *name)
-{
-}
 
 void
 ee_deleteTagbucket(struct ee_tagbucket *tagbucket)
 {
 	assert(tagbucket->objID == ObjID_TAGBUCKET);
 	tagbucket->objID = ObjID_DELETED;
-	xmlHashFree(tagbucket->ht, deallocator);
+	// TODO: free list (memleak)
 	free(tagbucket);
 }
 
 
+#if 0
 int ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname)
 {
 	int r;
@@ -92,8 +80,32 @@ int ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname)
 done:
 	return r;
 }
+#endif
+
+/* TODO: when in validating mode, check duplicate field entries */
+int
+ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname)
+{
+	int r;
+	struct ee_tagbucket_listnode *node;
+	assert(tagbucket != NULL);assert(tagbucket->objID == ObjID_TAGBUCKET);
+
+	CHKN(node = malloc(sizeof(struct ee_tagbucket_listnode)));
+	node->name = tagname;
+	node->next = NULL;
+	if(tagbucket->root == NULL) {
+		tagbucket->root = tagbucket->tail = node;
+	} else {
+		tagbucket->tail->next = node;
+		tagbucket->tail = node;
+	}
+	r = 0;
+
+done:	return r;
+}
 
 
+#if 0
 /* we can pass only one pointer to libxml2, so we unfortunately
  * need to set up a structure for the two parameters we have.
  */
@@ -120,3 +132,4 @@ ee_iterateOverBucketTags(struct ee_tagbucket *tagbucket,
 	iter.cookie = cookie;
 	xmlHashScan(tagbucket->ht, IteratorOverBucketTags, &iter);
 }
+#endif

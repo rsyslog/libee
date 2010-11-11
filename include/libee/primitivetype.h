@@ -66,5 +66,10 @@ struct ee_primitiveType* ee_newPrimitiveType(void);
  */
 void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
 
+/** 
+ * Parser for RFC3164 date.
+ */
+int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, size_t *offs,
+		     struct ee_value **newVal);
 
 #endif /* #ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED */

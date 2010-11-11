@@ -29,15 +29,22 @@
 #ifndef LIBEE_TAGBUCKET_H_INCLUDED
 #define	LIBEE_TAGBUCKET_H_INCLUDED
 
-#include <libxml/dict.h>
+/**
+ * Internal structure to represent linked list nodes for the tagbucket.
+ */
+struct ee_tagbucket_listnode {
+	char *name;	/* TODO: use es_str_t! */
+	struct ee_tagbucket_listnode *next;
+};
 
 /**
- * The tagbucket object, a container to store tags.
+ * The tagbucket class, a container to store tags.
  */
 struct ee_tagbucket {
 	unsigned objID;		/**< a magic number to prevent some memory adressing errors */
 	ee_ctx ctx;		/**< associated library context */
-	xmlHashTablePtr ht;	/**< this *is* the actual bucket ;) */
+	struct ee_tagbucket_listnode *root; /**< root of our tags list */
+	struct ee_tagbucket_listnode *tail; /**< list tail to speed up adding nodes */
 };
 
 /**

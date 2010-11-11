@@ -50,8 +50,7 @@ ee_newFieldbucket(ee_ctx ctx)
 	fieldbucket->ctx = ctx;
 	fieldbucket->root = fieldbucket->tail = NULL;
 
-done:
-	return fieldbucket;
+done:	return fieldbucket;
 }
 
 
@@ -85,6 +84,5 @@ ee_addFieldToBucket(struct ee_fieldbucket *fieldb, struct ee_field *field)
 	}
 	r = 0;
 
-done:
-	return r;
+done:	return r;
 }

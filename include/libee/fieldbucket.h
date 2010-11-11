@@ -29,8 +29,6 @@
 #ifndef LIBEE_FIELDBUCKET_H_INCLUDED
 #define	LIBEE_FIELDBUCKET_H_INCLUDED
 
-#include <libxml/hash.h>
-
 /**
  * Internal structure to represent linked list nodes for the fieldbucket.
  */

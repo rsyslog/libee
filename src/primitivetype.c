@@ -68,9 +68,9 @@ done:
 
 /* some helpers */
 static inline int
-hParseInt(char **buf, size_t *lenBuf)
+hParseInt(unsigned char **buf, size_t *lenBuf)
 {
-	char *p = *buf;
+	unsigned char *p = *buf;
 	size_t len = *lenBuf;
 	int i = 0;
 	
@@ -89,9 +89,10 @@ hParseInt(char **buf, size_t *lenBuf)
  *
  * All parsers receive 
  *
- * a context object
- * a pointer to the to-be-parsed string
- * a the size of the string (MUST be > 0!)
+ * @param[in] ctx context object
+ * @param[in] str the to-be-parsed string
+ * @param[in/out] an offset into the string
+ * @param[out] newVal newly created value
  *
  * They will try to parse out "their" object from the string. If they
  * succeed, they:
@@ -99,14 +100,15 @@ hParseInt(char **buf, size_t *lenBuf)
  * create a nw ee_value (newVal) and store the obtained value into it
  * update buf and lenBuf to reflect the parsing carried out
  *
- * returns 0 on success and something else otherwise
+ * returns 0 on success and EE_WORNGPARSER if this parser could
+ *           not successfully parse (but all went well otherwise) and something
+ *           else in case of an error.
  */
 #define BEGINParser(ParserName) \
-size_t parse##ParserName(ee_ctx __attribute__((unused)) ctx, char **buf, size_t *lenBuf, \
+int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, size_t *offs, \
                       struct ee_value **newVal) \
 { \
-	size_t r = -1; \
-	assert(*lenBuf > 0);
+	size_t r = -1;
 
 #define ENDParser \
 	return r; \
@@ -116,9 +118,9 @@ size_t parse##ParserName(ee_ctx __attribute__((unused)) ctx, char **buf, size_t 
 /**
  * Parse a RFC3164 Date.
  */
-BEGINParser(RFC316Date)
-	char *p = *buf;
-	size_t len = *lenBuf;
+BEGINParser(RFC3164Date)
+	unsigned char *p;
+	size_t len;
 	/* variables to temporarily hold time information while we parse */
 	int month;
 	int day;
@@ -127,6 +129,10 @@ BEGINParser(RFC316Date)
 	int minute;
 	int second;
 
+	assert(*offs < es_strlen(str));
+
+	p = es_getBufAddr(str) + *offs;
+	len = es_strlen(str) - *offs;
 	/* If we look at the month (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec),
 	 * we may see the following character sequences occur:
 	 *
@@ -329,8 +335,8 @@ BEGINParser(RFC316Date)
 	 * fields we do not have are not updated in the caller's timestamp. This
 	 * is the reason why the caller must pass in a correct timestamp.
 	 */
-	*buf = p; /* provide updated parse position back to caller */
-	*lenBuf = len;
+	*offs = (es_strlen(str) - *offs) - len;
+printf("RFC3164 date parser: offs %u, len %u\n", (unsigned) *offs, (unsigned) len);
 	r = 1; /* parsing was successful */
 #if 0 /* TODO: see how we represent the actual timestamp */
 	pTime->month = month;
@@ -345,6 +351,7 @@ fail:
 ENDParser
 
 
+#if 0
 /**
  * Parse a Number.
  * Note that a number is an abstracted concept. We always represent it
@@ -371,3 +378,4 @@ BEGINParser(Number)
 	*lenBuf = len;
 fail:
 ENDParser
+#endif
