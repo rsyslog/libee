@@ -76,4 +76,10 @@ int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value
  */
 int ee_parseNumber(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
 
+
+/** 
+ * Parser for Words (SP-terminated strings).
+ */
+int ee_parseWord(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
+
 #endif /* #ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED */

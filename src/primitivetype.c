@@ -394,3 +394,43 @@ printf("in parseNumber offs %u, usedLen %u, orglen %d, len %u\n", (int) *offs, (
 	//(*newVal)->val.number = n;
 fail:
 ENDParser
+
+
+/**
+ * Parse a word.
+ * A word is a SP-delimited entity. The parser always works, except if
+ * the offset is position on a space upon entry.
+ */
+BEGINParser(Word)
+	unsigned char *c;
+	size_t i;
+	size_t len;	/**< length of substring we finally extract */
+	es_str_t *valstr;
+
+	assert(str != NULL);
+	assert(offs != NULL);
+	c = es_getBufAddr(str);
+	i = *offs;
+
+	/* search end of word */
+	while(i < es_strlen(str) && c[i] != ' ') 
+		i++;
+
+	if(i == *offs) {
+		r = EE_WRONGPARSER;
+		goto done;
+	}
+
+	/* success, persist */
+	len =  i - *offs;
+	if(c[i] != ' ') { /* special case at end of string! */
+		++len;
+	}
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs, len));
+	ee_setStrValue(*value, valstr);
+	*offs = i;
+	r = 0;
+
+done:	return r;
+ENDParser
