@@ -69,17 +69,28 @@ void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
 /** 
  * Parser for RFC3164 date.
  */
-int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
+int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, size_t *offs, es_str_t *ed, struct ee_value **newVal);
 
 /** 
  * Parser for numbers.
  */
-int ee_parseNumber(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
+int ee_parseNumber(ee_ctx ctx, es_str_t *str, size_t *offs, es_str_t *ed, struct ee_value **newVal);
 
 
 /** 
  * Parser for Words (SP-terminated strings).
  */
-int ee_parseWord(ee_ctx ctx, es_str_t *str, size_t *offs, struct ee_value **newVal);
+int ee_parseWord(ee_ctx ctx, es_str_t *str, size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
+
+/** 
+ * Parse everything up to a specific character.
+ */
+int ee_parseCharTo(ee_ctx ctx, es_str_t *str, size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
+/** 
+ * Parser for IPv4 addresses.
+ */
+int ee_parseIPv4(ee_ctx ctx, es_str_t *str, size_t *offs, es_str_t *ed, struct ee_value **newVal);
 
 #endif /* #ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED */

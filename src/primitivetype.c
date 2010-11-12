@@ -91,7 +91,8 @@ hParseInt(unsigned char **buf, size_t *lenBuf)
  *
  * @param[in] ctx context object
  * @param[in] str the to-be-parsed string
- * @param[in/out] an offset into the string
+ * @param[in/out] offs an offset into the string
+ * @param[in] ed string with extra data for parser use
  * @param[out] newVal newly created value
  *
  * They will try to parse out "their" object from the string. If they
@@ -107,7 +108,7 @@ hParseInt(unsigned char **buf, size_t *lenBuf)
 //int ee_parse##ParserName(es_str_t *str, size_t *offs, 
 #define BEGINParser(ParserName) \
 int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, size_t *offs, \
-                      struct ee_value **value) \
+                      __attribute__((unused)) es_str_t *ed, struct ee_value **value) \
 { \
 	size_t r = EE_WRONGPARSER;
 
@@ -125,7 +126,7 @@ BEGINParser(RFC3164Date)
 	/* variables to temporarily hold time information while we parse */
 	int month;
 	int day;
-	int year = 0; /* 0 means no year provided */
+	//int year = 0; /* 0 means no year provided */
 	int hour; /* 24 hour clock */
 	int minute;
 	int second;
@@ -342,8 +343,6 @@ BEGINParser(RFC3164Date)
 	*value = ee_newValue(ctx);
 	ee_setStrValue(*value, valstr);
 	*offs += usedLen;
-printf("RFC3164 date parser: offs %u, len %u, usedLen %u\n", (unsigned) *offs, (unsigned) len,
-	(unsigned) usedLen);
 	r = 0; /* parsing was successful */
 #if 0 /* TODO: see how we represent the actual timestamp */
 	pTime->month = month;
@@ -369,7 +368,7 @@ BEGINParser(Number)
 	long long n;
 
 
-printf("parseNumber got '%s'\n", es_str2cstr(str, NULL)+ *offs);
+//printf("parseNumber got '%s'\n", es_str2cstr(str, NULL)+ *offs);
 	p = es_getBufAddr(str) + *offs;
 	orglen = len = es_strlen(str) - *offs;
 
@@ -384,14 +383,10 @@ printf("parseNumber got '%s'\n", es_str2cstr(str, NULL)+ *offs);
 
 	/* success, persist */
 	size_t usedLen =  orglen - len;
-printf("in parseNumber offs %u, usedLen %u, orglen %d, len %u\n", (int) *offs, (int)usedLen, (int)orglen, (int)len);
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
 	ee_setStrValue(*value, valstr);
 	*offs += usedLen;
 	r = 0;
-printf("in parseNumber offs %u, usedLen %u, orglen %d, len %u\n", (int) *offs, (int)usedLen, (int)orglen, (int)len);
-	//(*newVal)->valtype = ee_valtype_nbr;
-	//(*newVal)->val.number = n;
 fail:
 ENDParser
 
@@ -428,6 +423,121 @@ BEGINParser(Word)
 	}
 	CHKN(*value = ee_newValue(ctx));
 	CHKN(valstr = es_newStrFromSubStr(str, *offs, len));
+	ee_setStrValue(*value, valstr);
+	*offs = i;
+	r = 0;
+
+done:	return r;
+ENDParser
+
+
+/**
+ * Parse everything up to a specific character.
+ * The character must be the only char inside extra data passed to the parser.
+ * It is a program error if strlen(ed) != 1. It is considered a format error if
+ * a) the to-be-parsed buffer is already positioned on the terminator character
+ * b) there is no terminator until the end of the buffer
+ * In those cases, the parsers declares itself as not being successful, in all
+ * other cases a string is extracted.
+ */
+BEGINParser(CharTo)
+	unsigned char *c;
+	unsigned char cTerm;
+	size_t i;
+	es_str_t *valstr;
+
+	assert(str != NULL);
+	assert(offs != NULL);
+	assert(es_strlen(ed) == 1);
+	cTerm = *(es_getBufAddr(ed));
+	c = es_getBufAddr(str);
+	i = *offs;
+
+	/* search end of word */
+	while(i < es_strlen(str) && c[i] != cTerm) 
+		i++;
+
+	if(i == *offs || c[i] != cTerm) {
+		r = EE_WRONGPARSER;
+		goto done;
+	}
+
+	/* success, persist */
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs, i - *offs));
+	ee_setStrValue(*value, valstr);
+	*offs = i;
+	r = 0;
+
+done:	return r;
+ENDParser
+
+
+
+/* helper to IPv4 address parser, checks the next set of numbers.
+ * Syntax 1 to 3 digits, value together not larger than 255.
+ * @param[in] str parse buffer
+ * @param[in/out] offs offset into buffer, updated if successful
+ * @return 0 if OK, 1 otherwise
+ */
+static int
+chkIPv4AddrByte(es_str_t *str, size_t *offs)
+{
+	int val = 0;
+	int r = 1;	/* default: fail -- simplifies things */
+	unsigned char *c = es_getBufAddr(str);
+	size_t i = *offs;
+
+	if(i == es_strlen(str) || !isdigit(c[i])) goto done;
+	val = c[i++] - '0';
+	if(i < es_strlen(str) && isdigit(c[i])) {
+		val = val * 10 + c[i++] - '0';
+		if(i < es_strlen(str) && isdigit(c[i]))
+			val = val * 10 + c[i++] - '0';
+	}
+	if(val > 255)	/* cannot be a valid IP address byte! */
+		goto done;
+
+	*offs = i;
+	r = 0;
+
+done:	return r;
+}
+/**
+ * Parser for IPv4 addresses.
+ */
+BEGINParser(IPv4)
+	unsigned char *c;
+	size_t i;
+	es_str_t *valstr;
+
+printf("parseIPv4 got '%s'\n", es_str2cstr(str, NULL)+ *offs);fflush(stdout);
+	assert(str != NULL);
+	assert(offs != NULL);
+	i = *offs;
+	if(es_strlen(str) - i + 1 < 7) {
+		/* IPv4 addr requires at least 7 characters */
+		r = EE_WRONGPARSER;
+		goto done;
+	}
+	c = es_getBufAddr(str);
+
+	r = EE_WRONGPARSER; /* let's assume things go wrong, leads to simpler code */
+	/* byte 1*/
+	if(chkIPv4AddrByte(str, &i) != 0) goto done;
+	if(i == es_strlen(str) || c[i++] != '.') goto done;
+	/* byte 2*/
+	if(chkIPv4AddrByte(str, &i) != 0) goto done;
+	if(i == es_strlen(str) || c[i++] != '.') goto done;
+	/* byte 3*/
+	if(chkIPv4AddrByte(str, &i) != 0) goto done;
+	if(i == es_strlen(str) || c[i++] != '.') goto done;
+	/* byte 4 - we do NOT need any char behind it! */
+	if(chkIPv4AddrByte(str, &i) != 0) goto done;
+
+	/* if we reach this point, we found a valid IP address */
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs, i - *offs));
 	ee_setStrValue(*value, valstr);
 	*offs = i;
 	r = 0;
