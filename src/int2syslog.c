@@ -37,7 +37,7 @@
 static ee_ctx ctx;
 static FILE *fpIn;
 static int verbose = 0;
-static enum { f_all, f_syslog, f_json } outfmt = f_syslog;
+static enum { f_all, f_syslog, f_json, f_xml } outfmt = f_syslog;
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -70,12 +70,21 @@ static int cbNewEvt(struct ee_event *event)
 		printf("%s\n", es_str2cstr(out, NULL));
 		es_deleteStr(out);
 		break;
+	case f_xml:
+		ee_fmtEventToXML(event, &out);
+		printf("%s\n", es_str2cstr(out, NULL));
+		es_deleteStr(out);
+		break;
 	case f_all:
+		printf("\n");
 		ee_fmtEventToRFC5424(event, &out);
 		printf("syslog: %s\n", es_str2cstr(out, NULL));
 		es_deleteStr(out);
 		ee_fmtEventToJSON(event, &out);
 		printf("json..: %s\n", es_str2cstr(out, NULL));
+		es_deleteStr(out);
+		ee_fmtEventToXML(event, &out);
+		printf("xml...: %s\n", es_str2cstr(out, NULL));
 		es_deleteStr(out);
 		break;
 	}
@@ -147,6 +156,8 @@ int main(int argc, char *argv[])
 		case 'o': /* output format */
 			if(!strcmp(optarg, "json")) {
 				outfmt = f_json;
+			} else if(!strcmp(optarg, "xml")) {
+				outfmt = f_xml;
 			} else if(!strcmp(optarg, "all")) {
 				outfmt = f_all;
 			}

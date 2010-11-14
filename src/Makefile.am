@@ -28,7 +28,8 @@ libee_la_SOURCES = \
 	primitivetype.c \
 	int_dec.c \
 	syslog_enc.c \
-	json_enc.c
+	json_enc.c \
+	xml_enc.c
 
 libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS)

@@ -158,4 +158,25 @@ int ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str);
  * @return	0 on success, something else otherwise.
  */
 int ee_fmtEventToJSON(struct ee_event *event, es_str_t **str);
+
+
+/**
+ * Format an event in XML format.
+ *
+ * This method takes an event and creates a new string representation
+ * in XML format. The string is passed to the caller, which then
+ * is responsible for freeing it.
+ *
+ * <b>This is part of the ezAPI for libee</b>
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event to format
+ * @param[out] str pointer to string with XML representation, caller must destruct
+
+ * @return	0 on success, something else otherwise.
+ */
+int ee_fmtEventToXML(struct ee_event *event, es_str_t **str);
+
 #endif /* #ifndef LIBEE_EVENT_H_INCLUDED */

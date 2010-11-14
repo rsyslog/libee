@@ -107,4 +107,23 @@ int ee_setStrValue(struct ee_value *value, es_str_t *val);
  */
 int ee_addValue_Syslog(struct ee_value *value, es_str_t **str);
 
+
+/**
+ * Encode the current value in XML format and add it to the provided string.
+ * If just the plain value is required, an empty string must be passed
+ * in. The interface is defined in a away that prevents multiple write
+ * operations when constructing event output formats, which usually
+ * involve concatenation.
+ *
+ * 
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] val value to enocde
+ * @param[out]  str string to wich the encoded value is to be added.
+ * 		   Must have been allocated by the caller.
+ * @returns 0 on success, something else otherwise
+ */
+int ee_addValue_XML(struct ee_value *value, es_str_t **str);
+
 #endif /* #ifndef LIBEE_VALUE_H_INCLUDED */
