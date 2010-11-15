@@ -33,6 +33,7 @@
 #include "config.h"
 #include "libee/libee.h"
 #include "libee/int.h"
+#include "libee/internal.h"
 
 static ee_ctx ctx;
 static FILE *fpIn;

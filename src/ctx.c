@@ -25,6 +25,7 @@
 #include <stdarg.h>
 
 #include "libee/libee.h"
+#include "libee/internal.h"
 #include "libee/ctx.h"
 
 #define ERR_ABORT {r = 1; goto done; }

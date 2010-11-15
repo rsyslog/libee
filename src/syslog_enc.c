@@ -33,6 +33,7 @@
 #include <assert.h>
 
 #include "libee/libee.h"
+#include "libee/internal.h"
 
 
 int

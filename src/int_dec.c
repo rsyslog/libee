@@ -30,6 +30,7 @@
 
 #include "libee/libee.h"
 #include "libee/int.h"
+#include "libee/internal.h"
 
 
 /**

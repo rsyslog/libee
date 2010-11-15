@@ -30,6 +30,7 @@
 #include <libestr.h>
 
 #include "libee/libee.h"
+#include "libee/internal.h"
 #include "libee/field.h"
 #include "libee/value.h"
 

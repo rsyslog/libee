@@ -31,6 +31,7 @@
 #include <ctype.h>
 
 #include "libee/libee.h"
+#include "libee/internal.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 
