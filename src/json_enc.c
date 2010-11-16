@@ -55,7 +55,7 @@ ee_addValue_JSON(struct ee_value *value, es_str_t **str)
 	es_str_t *valstr;
 	unsigned char *buf;
 	unsigned char c;
-	size_t i;
+	es_size_t i;
 	char numbuf[4];
 	int j;
 

@@ -42,7 +42,7 @@ ee_addValue_Syslog(struct ee_value *value, es_str_t **str)
 	int r;
 	es_str_t *valstr;
 	unsigned char *c;
-	size_t i;
+	es_size_t i;
 
 	assert(str != NULL); assert(*str != NULL);
 	assert(value != NULL); assert(value->objID == ObjID_VALUE);

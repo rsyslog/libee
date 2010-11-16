@@ -69,10 +69,10 @@ done:
 
 /* some helpers */
 static inline int
-hParseInt(unsigned char **buf, size_t *lenBuf)
+hParseInt(unsigned char **buf, es_size_t *lenBuf)
 {
 	unsigned char *p = *buf;
-	size_t len = *lenBuf;
+	es_size_t len = *lenBuf;
 	int i = 0;
 	
 	while(len > 0 && isdigit(*p)) {
@@ -106,12 +106,11 @@ hParseInt(unsigned char **buf, size_t *lenBuf)
  *           not successfully parse (but all went well otherwise) and something
  *           else in case of an error.
  */
-//int ee_parse##ParserName(es_str_t *str, size_t *offs, 
 #define BEGINParser(ParserName) \
-int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, size_t *offs, \
+int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, es_size_t *offs, \
                       __attribute__((unused)) es_str_t *ed, struct ee_value **value) \
 { \
-	size_t r = EE_WRONGPARSER;
+	es_size_t r = EE_WRONGPARSER;
 
 #define ENDParser \
 	return r; \
@@ -123,7 +122,7 @@ int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, size
  */
 BEGINParser(RFC3164Date)
 	unsigned char *p;
-	size_t len, orglen;
+	es_size_t len, orglen;
 	/* variables to temporarily hold time information while we parse */
 	int month;
 	int day;
@@ -339,7 +338,7 @@ BEGINParser(RFC3164Date)
 	 * fields we do not have are not updated in the caller's timestamp. This
 	 * is the reason why the caller must pass in a correct timestamp.
 	 */
-	size_t usedLen =  orglen - len;
+	es_size_t usedLen =  orglen - len;
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
 	*value = ee_newValue(ctx);
 	ee_setStrValue(*value, valstr);
@@ -365,7 +364,7 @@ ENDParser
  */
 BEGINParser(Number)
 	unsigned char *p;
-	size_t len, orglen;
+	es_size_t len, orglen;
 	long long n;
 
 
@@ -383,7 +382,7 @@ BEGINParser(Number)
 	}
 
 	/* success, persist */
-	size_t usedLen =  orglen - len;
+	es_size_t usedLen =  orglen - len;
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
 	ee_setStrValue(*value, valstr);
 	*offs += usedLen;
@@ -399,8 +398,8 @@ ENDParser
  */
 BEGINParser(Word)
 	unsigned char *c;
-	size_t i;
-	size_t len;	/**< length of substring we finally extract */
+	es_size_t i;
+	es_size_t len;	/**< length of substring we finally extract */
 	es_str_t *valstr;
 
 	assert(str != NULL);
@@ -412,6 +411,10 @@ BEGINParser(Word)
 	while(i < es_strlen(str) && c[i] != ' ') 
 		i++;
 
+	if(i == es_strlen(str)) {
+		/* we reached end of string, so i is off by one */
+		--i;
+	}
 	if(i == *offs) {
 		r = EE_WRONGPARSER;
 		goto done;
@@ -419,9 +422,6 @@ BEGINParser(Word)
 
 	/* success, persist */
 	len =  i - *offs;
-	if(c[i] != ' ') { /* special case at end of string! */
-		++len;
-	}
 	CHKN(*value = ee_newValue(ctx));
 	CHKN(valstr = es_newStrFromSubStr(str, *offs, len));
 	ee_setStrValue(*value, valstr);
@@ -444,7 +444,7 @@ ENDParser
 BEGINParser(CharTo)
 	unsigned char *c;
 	unsigned char cTerm;
-	size_t i;
+	es_size_t i;
 	es_str_t *valstr;
 
 	assert(str != NULL);
@@ -458,6 +458,10 @@ BEGINParser(CharTo)
 	while(i < es_strlen(str) && c[i] != cTerm) 
 		i++;
 
+	if(i == es_strlen(str)) {
+		/* we reached end of string, so i is off by one */
+		--i;
+	}
 	if(i == *offs || c[i] != cTerm) {
 		r = EE_WRONGPARSER;
 		goto done;
@@ -482,12 +486,12 @@ ENDParser
  * @return 0 if OK, 1 otherwise
  */
 static int
-chkIPv4AddrByte(es_str_t *str, size_t *offs)
+chkIPv4AddrByte(es_str_t *str, es_size_t *offs)
 {
 	int val = 0;
 	int r = 1;	/* default: fail -- simplifies things */
 	unsigned char *c = es_getBufAddr(str);
-	size_t i = *offs;
+	es_size_t i = *offs;
 
 	if(i == es_strlen(str) || !isdigit(c[i])) goto done;
 	val = c[i++] - '0';
@@ -509,10 +513,9 @@ done:	return r;
  */
 BEGINParser(IPv4)
 	unsigned char *c;
-	size_t i;
+	es_size_t i;
 	es_str_t *valstr;
 
-printf("parseIPv4 got '%s'\n", es_str2cstr(str, NULL)+ *offs);fflush(stdout);
 	assert(str != NULL);
 	assert(offs != NULL);
 	i = *offs;
