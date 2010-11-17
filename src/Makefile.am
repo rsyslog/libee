@@ -1,4 +1,4 @@
-sbin_PROGRAMS = int2syslog
+sbin_PROGRAMS = convert
 
 # Uncomment for debugging
 DEBUG = -g
@@ -36,8 +36,8 @@ libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS)
 libee_la_LDFLAGS = -version-info 0:0:0
 
-int2syslog_SOURCES = int2syslog.c
-int2syslog_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBXML2_CFLAGS)
-int2syslog_LDADD = $(LIBEE_LIBS) $(LIBXML2_LIBS) $(LIBESTR_LIBS)
+convert_SOURCES = convert.c
+convert_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBXML2_CFLAGS)
+convert_LDADD = $(LIBEE_LIBS) $(LIBXML2_LIBS) $(LIBESTR_LIBS)
 
 include_HEADERS = 
