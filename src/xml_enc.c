@@ -160,10 +160,14 @@ ee_fmtEventToXML(struct ee_event *event, es_str_t **str)
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
-	for(node = event->fields->root ; node != NULL ; node = node->next) {
-		assert(node->field->objID == ObjID_FIELD);
-		ee_addField_XML(node->field, str);
+	es_addBuf(str, "<event>", 7);
+	if(event->fields != NULL) {
+		for(node = event->fields->root ; node != NULL ; node = node->next) {
+			assert(node->field->objID == ObjID_FIELD);
+			ee_addField_XML(node->field, str);
+		}
 	}
+	es_addBuf(str, "</event>", 8);
 
 done:
 	return r;

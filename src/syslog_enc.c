@@ -135,10 +135,12 @@ ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 	if((*str = es_newStr(256)) == NULL) goto done;
 
 	es_addBuf(str, "[cee@...", 8);
-	for(node = event->fields->root ; node != NULL ; node = node->next) {
-		assert(node->field->objID == ObjID_FIELD);
-		es_addChar(str, ' ');
-		ee_addField_Syslog(node->field, str);
+	if(event->fields != NULL) {
+		for(node = event->fields->root ; node != NULL ; node = node->next) {
+			assert(node->field->objID == ObjID_FIELD);
+			es_addChar(str, ' ');
+			ee_addField_Syslog(node->field, str);
+		}
 	}
 	es_addChar(str, ']');
 

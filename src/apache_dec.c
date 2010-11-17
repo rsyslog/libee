@@ -256,9 +256,6 @@ ee_apacheDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 	lnNbr = 1;
 	r = cbGetLine(&ln);
 	while(r == 0) {
-//char *cstr = es_str2cstr(ln, NULL);
-//printf("apacheDec, ln: '%s'\n", cstr);
-//free(cstr);
 		if((r = processLn(ctx, apache, ln, cbNewEvt)) != 0) {
 			errlen = snprintf(errMsgBuf, sizeof(errMsgBuf),
 					  "error processing line %d", lnNbr);
