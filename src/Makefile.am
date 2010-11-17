@@ -32,12 +32,12 @@ libee_la_SOURCES = \
 	json_enc.c \
 	xml_enc.c
 
-libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBEE_CFLAGS)
-libee_la_LIBADD = $(LIBXML2_LIBS)
+libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBESTR_CFLAGS) $(LIBEE_CFLAGS)
+libee_la_LIBADD = $(LIBXML2_LIBS) $(LIBESTR_LIBS)
 libee_la_LDFLAGS = -version-info 0:0:0
 
 convert_SOURCES = convert.c
-convert_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBXML2_CFLAGS)
+convert_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBESTR_CFLAGS) $(LIBXML2_CFLAGS)
 convert_LDADD = $(LIBEE_LIBS) $(LIBXML2_LIBS) $(LIBESTR_LIBS)
 
 include_HEADERS = 
