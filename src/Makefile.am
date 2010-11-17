@@ -27,6 +27,7 @@ libee_la_SOURCES = \
 	fieldbucket.c \
 	primitivetype.c \
 	int_dec.c \
+	apache_dec.c \
 	syslog_enc.c \
 	json_enc.c \
 	xml_enc.c

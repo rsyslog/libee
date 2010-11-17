@@ -66,6 +66,12 @@ ee_addValue_Syslog(struct ee_value *value, es_str_t **str)
 			es_addChar(str, '\\');
 			es_addChar(str, ',');
 			break;
+#if 0 /* alternative encoding for discussion */
+		case '^': /* CEE-reserved for lists */
+			es_addChar(str, '\\');
+			es_addChar(str, '^');
+			break;
+#endif
 		/* at this layer ... do we need to think about transport
 		 * encoding at all? Or simply leave it to the transport agent?
 		 */

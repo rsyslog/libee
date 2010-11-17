@@ -1,5 +1,5 @@
 /**
- * @file int2syslog1.c
+ * @file int2syslog.c
  * @brief A tool to convert internal representation to syslog format
  *
  * @author Rainer Gerhards <rgerhards@adiscon.com>
@@ -30,15 +30,20 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <libestr.h>
+#include <assert.h>
 #include "config.h"
 #include "libee/libee.h"
 #include "libee/int.h"
+#include "libee/apache.h"
 #include "libee/internal.h"
 
 static ee_ctx ctx;
 static FILE *fpIn;
 static int verbose = 0;
-static enum { f_all, f_syslog, f_json, f_xml } outfmt = f_syslog;
+enum codec { f_all, f_syslog, f_json, f_xml, f_int, f_apache };
+static enum codec encoder = f_syslog;
+static enum codec decoder = f_int;
+static es_str_t *decFmt = NULL; /**< a format string for decoder use */
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -60,7 +65,7 @@ static int cbNewEvt(struct ee_event *event)
 {
 	es_str_t *out;
 
-	switch(outfmt) {
+	switch(encoder) {
 	case f_syslog:
 		ee_fmtEventToRFC5424(event, &out);
 		printf("%s\n", es_str2cstr(out, NULL));
@@ -88,6 +93,9 @@ static int cbNewEvt(struct ee_event *event)
 		printf("xml...: %s\n", es_str2cstr(out, NULL));
 		es_deleteStr(out);
 		break;
+	default:
+		assert(0); /* if this happens, we have a program error */
+		return -1;
 	}
 
 	return 0;
@@ -143,7 +151,7 @@ int main(int argc, char *argv[])
 	}
 	ee_setDebugCB(ctx, dbgCallBack, NULL);
 
-	while((opt = getopt(argc, argv, "c:i:vo:")) != -1) {
+	while((opt = getopt(argc, argv, "c:i:ve:d:D:")) != -1) {
 		switch (opt) {
 		case 'i':
 			if((fpIn = fopen(optarg, "r")) == NULL) {
@@ -154,14 +162,26 @@ int main(int argc, char *argv[])
 		case 'v':
 			verbose = 1;
 			break;
-		case 'o': /* output format */
+		case 'e': /* encoder to use */
 			if(!strcmp(optarg, "json")) {
-				outfmt = f_json;
+				encoder = f_json;
 			} else if(!strcmp(optarg, "xml")) {
-				outfmt = f_xml;
+				encoder = f_xml;
+			} else if(!strcmp(optarg, "syslog")) {
+				encoder = f_syslog;
 			} else if(!strcmp(optarg, "all")) {
-				outfmt = f_all;
+				encoder = f_all;
 			}
+			break;
+		case 'd': /* decoder to use */
+			if(!strcmp(optarg, "int")) {
+				decoder = f_int;
+			} else if(!strcmp(optarg, "apache")) {
+				decoder = f_apache;
+			}
+			break;
+		case 'D': /* decoder-specific format string (will be validated by decoder) */ 
+			decFmt = es_newStrFromCStr(optarg, strlen(optarg));
 			break;
 		case 'c': /* compactness of encoding */
 			if(!strcmp(optarg, "ultra")) {
@@ -176,12 +196,35 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if((r = ee_intDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
-		cstr = es_str2cstr(errmsg, NULL);
-		snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: %s\n",
-			 r, cstr);
-		free(cstr);
-		errout(errbuf);
+	switch(decoder) {
+	case f_int:
+		if((r = ee_intDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
+			cstr = es_str2cstr(errmsg, NULL);
+			snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: %s\n",
+				 r, cstr);
+			free(cstr);
+			errout(errbuf);
+		}
+		break;
+	case f_apache:
+		{
+		struct ee_apache *apache;
+		apache = ee_newApache(ctx);
+		if(ee_apacheNameList(ctx, apache, decFmt) != 0) {
+			errout("error applying decoder format string");
+		}
+		if((r = ee_apacheDec(ctx, cbGetLine, cbNewEvt, &errmsg, apache)) != 0) {
+			cstr = es_str2cstr(errmsg, NULL);
+			snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: %s\n",
+				 r, cstr);
+			free(cstr);
+			errout(errbuf);
+		}
+		ee_deleteApache(apache);
+		}
+		break;
+	default:
+		errout("program error, decoder not yet supported");
 	}
 
 	ee_exitCtx(ctx);

@@ -64,6 +64,7 @@ ee_addValue_XML(struct ee_value *value, es_str_t **str)
 	// TODO: support other types!
 	assert(value->valtype == ee_valtype_str);
 	valstr = value->val.str;
+	es_addBuf(str, "<value>", 7);
 
 	buf = es_getBufAddr(valstr);
 	for(i = 0 ; i < es_strlen(valstr) ; ++i) {
@@ -72,6 +73,7 @@ ee_addValue_XML(struct ee_value *value, es_str_t **str)
 		case '\0':
 			es_addBuf(str, "&#00;", 5);
 			break;
+#if 0
 		case '\n':
 			es_addBuf(str, "&#10;", 5);
 			break;
@@ -84,18 +86,21 @@ ee_addValue_XML(struct ee_value *value, es_str_t **str)
 		case '\"':
 			es_addBuf(str, "&quot;", 6);
 			break;
+#endif
 		case '<':
 			es_addBuf(str, "&lt;", 4);
 			break;
 		case '&':
 			es_addBuf(str, "&amp;", 5);
 			break;
+#if 0
 		case ',':
 			es_addBuf(str, "\\,", 2);
 			break;
 		case '\'':
 			es_addBuf(str, "&apos;", 6);
 			break;
+#endif
 		default:
 			es_addChar(str, c);
 #if 0
@@ -110,6 +115,7 @@ ee_addValue_XML(struct ee_value *value, es_str_t **str)
 #endif
 		}
 	}
+	es_addBuf(str, "</value>", 8);
 	r = 0;
 
 	return r;
@@ -131,13 +137,10 @@ ee_addField_XML(struct ee_field *field, es_str_t **str)
 		if(field->nVals == 1) {
 			CHKR(ee_addValue_XML(field->val, str));
 		} else { /* we have multiple values --> array */
-			CHKR(es_addChar(str, '('));
 			CHKR(ee_addValue_XML(field->val, str));
 			for(valnode = field->valroot ; valnode != NULL ; valnode = valnode->next) {
-				CHKR(es_addChar(str, ','));
 				CHKR(ee_addValue_XML(valnode->val, str));
 			}
-			CHKR(es_addChar(str, ')'));
 		}
 	}
 	CHKR(es_addBuf(str, "</Field>", 8));
