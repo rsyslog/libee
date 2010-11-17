@@ -176,38 +176,16 @@ processField(ee_ctx ctx, es_str_t *str, es_size_t *offs, struct ee_value **value
 		es_addChar(&val, c[i]);
 		++i;
 	}
-	
+	/* just a dash means this field is empty! */
+	if(!es_strconstcmp(val, "-"))
+		es_emptyStr(val);
+
 	ee_setStrValue(*value, val);
 	*offs = i;
 	r = 0;
 
 done:	return r;
 }
-
-
-#if 0
-int
-ee_normalizeApache(ee_ctx ctx, struct ee_apache *apache, es_str_t *str, struct ee_event **event)
-{
-	int r;
-	es_size_t i;
-	struct ee_value *val;
-	ee_fieldListApache_t *node;
-	struct ee_value *value;
-
-	i = 0;
-	node = apache->nroot;
-	while(node != NULL && i < es_strlen(str)) {
-		CHKR(processField(ctx, str, &i, &val));
-		CHKR(addField(ctx, event, node->name, val));
-		node = node->next;
-	}
-
-	r = 0;
-
-done:	return r;
-}
-#endif
 
 
 /**

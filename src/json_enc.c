@@ -1,3 +1,4 @@
+//#define NO_EMPTY_FIELDS /* undef for "normal" behaviour */
 /**
  * @file json_enc.c
  * Encoder for JSON format.
@@ -131,6 +132,15 @@ ee_addField_JSON(struct ee_field *field, es_str_t **str)
 
 	assert(field != NULL);assert(field->objID== ObjID_FIELD);
 	assert(str != NULL); assert(*str != NULL);
+#ifdef NO_EMPTY_FIELDS
+if(field->nVals == 0) {
+	r = 1;
+	goto done;
+} else if(field->nVals == 1 && es_strlen(field->val->val.str) == 0) {
+	r = 1;
+	goto done;
+}
+#endif
 	CHKR(es_addChar(str, '\"'));
 	CHKR(es_addStr(str, field->name));
 	if(ee_ctxIsEncUltraCompact(field->ctx)) {
@@ -168,8 +178,6 @@ ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 	int r = -1;
 	struct ee_fieldbucket_listnode *node;
 
-static int call = 0;
-printf("in call %d\n", ++call);
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
@@ -177,7 +185,12 @@ printf("in call %d\n", ++call);
 	if(event->fields != NULL) {
 		for(node = event->fields->root ; node != NULL ; node = node->next) {
 			assert(node->field->objID == ObjID_FIELD);
+#ifdef NO_EMPTY_FIELDS
+			if(ee_addField_JSON(node->field, str) == 1)
+				continue;
+#else
 			ee_addField_JSON(node->field, str);
+#endif
 			if(node->next != NULL)
 				es_addBuf(str, ", ", ee_ctxIsEncUltraCompact(event->ctx) ? 1 : 2);
 		}
