@@ -66,6 +66,20 @@ struct ee_primitiveType* ee_newPrimitiveType(void);
  */
 void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
 
+/**
+ * Parser interface.
+ * @param[in] ctx current context
+ * @param[in] str input string
+ * @param[in/out] offs offset where parsing has to start inside str.
+ * 	Updated on exist. \b Note: if the parser consumed all characters,
+ * 	offs equals strlen(str) on exit. This is part of the interface and
+ * 	the predicate for the caller to detect end of parsing.
+ * @param[in] ed string with extra data
+ * @param[out] newVal new value object created if parsing was successful
+ * @return 0 on success, something else otherwise
+ */
+
+
 /** 
  * Parser for RFC3164 date.
  */

@@ -411,10 +411,6 @@ BEGINParser(Word)
 	while(i < es_strlen(str) && c[i] != ' ') 
 		i++;
 
-	if(i == es_strlen(str)) {
-		/* we reached end of string, so i is off by one */
-		--i;
-	}
 	if(i == *offs) {
 		r = EE_WRONGPARSER;
 		goto done;
@@ -458,11 +454,7 @@ BEGINParser(CharTo)
 	while(i < es_strlen(str) && c[i] != cTerm) 
 		i++;
 
-	if(i == es_strlen(str)) {
-		/* we reached end of string, so i is off by one */
-		--i;
-	}
-	if(i == *offs || c[i] != cTerm) {
+	if(i == *offs || i == es_strlen(str) || c[i] != cTerm) {
 		r = EE_WRONGPARSER;
 		goto done;
 	}
