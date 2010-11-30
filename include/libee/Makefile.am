@@ -12,7 +12,10 @@ eeinc_HEADERS = \
 		field.h \
 		obj.h \
 		parser.h \
+		internal.h \
+		int.h \
 		primitivetype.h \
+		apache.h \
 		tagbucket.h \
 		tag.h \
 		tagset.h \
