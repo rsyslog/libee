@@ -159,4 +159,30 @@ int ee_addField_Syslog(struct ee_field *value, es_str_t **str);
  */
 int ee_addField_XML(struct ee_field *value, es_str_t **str);
 
+
+/**
+ * Get the number of values the field has.
+ *
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] field relevant field
+ * @returns number of values
+ */
+int ee_getNumFieldVals(struct ee_field *field);
+
+/**
+ * Get a specific value from this field as a string.
+ *
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] field relevant field
+ * @param[in] n number of the field to return, zero-based (like C arrays)
+ *
+ * @returns string representation of the n-th field value or NULL in
+ * 	case of error
+ */
+es_str_t* ee_getFieldValueAsStr(struct ee_field *field, unsigned short n);
+
 #endif /* #ifndef LIBEE_FIELD_H_INCLUDED */

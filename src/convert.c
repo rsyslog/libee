@@ -64,33 +64,46 @@ void errout(char *errmsg)
 static int cbNewEvt(struct ee_event *event)
 {
 	es_str_t *out;
+	char *cstr;
 
 	switch(encoder) {
 	case f_syslog:
 		ee_fmtEventToRFC5424(event, &out);
-		printf("%s\n", es_str2cstr(out, NULL));
+		cstr = es_str2cstr(out, NULL);
+		printf("%s\n", cstr);
+		free(cstr);
 		es_deleteStr(out);
 		break;
 	case f_json:
 		ee_fmtEventToJSON(event, &out);
-		printf("%s\n", es_str2cstr(out, NULL));
+		cstr = es_str2cstr(out, NULL);
+		printf("%s\n", cstr);
+		free(cstr);
 		es_deleteStr(out);
 		break;
 	case f_xml:
 		ee_fmtEventToXML(event, &out);
-		printf("%s\n", es_str2cstr(out, NULL));
+		cstr = es_str2cstr(out, NULL);
+		printf("%s\n", cstr);
+		free(cstr);
 		es_deleteStr(out);
 		break;
 	case f_all:
 		printf("\n");
 		ee_fmtEventToRFC5424(event, &out);
-		printf("syslog: %s\n", es_str2cstr(out, NULL));
+		cstr = es_str2cstr(out, NULL);
+		printf("syslog: %s\n", cstr);
+		free(cstr);
 		es_deleteStr(out);
 		ee_fmtEventToJSON(event, &out);
-		printf("json..: %s\n", es_str2cstr(out, NULL));
+		cstr = es_str2cstr(out, NULL);
+		printf("json..: %s\n", cstr);
+		free(cstr);
 		es_deleteStr(out);
 		ee_fmtEventToXML(event, &out);
-		printf("xml...: %s\n", es_str2cstr(out, NULL));
+		cstr = es_str2cstr(out, NULL);
+		printf("xml...: %s\n", cstr);
+		free(cstr);
 		es_deleteStr(out);
 		break;
 	default:
@@ -98,6 +111,7 @@ static int cbNewEvt(struct ee_event *event)
 		return -1;
 	}
 
+	ee_deleteEvent(event);
 	return 0;
 }
 

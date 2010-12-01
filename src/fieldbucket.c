@@ -58,9 +58,16 @@ done:	return fieldbucket;
 void
 ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket)
 {
+	struct ee_fieldbucket_listnode *node, *nodeDel;
+
 	assert(fieldbucket->objID == ObjID_FIELDBUCKET);
 	fieldbucket->objID = ObjID_DELETED;
-	// TODO: free list (memleak!)
+	for(node = fieldbucket->root ; node != NULL ; ) {
+		nodeDel = node;
+		node = node->next;
+		ee_deleteField(nodeDel->field);
+		free(nodeDel);
+	}
 	free(fieldbucket);
 }
 
@@ -86,4 +93,57 @@ ee_addFieldToBucket(struct ee_fieldbucket *fieldb, struct ee_field *field)
 	r = 0;
 
 done:	return r;
+}
+
+
+/* Note: this function currently is quite performance-hungry. We should
+ * replace all this searching by hashtable access some time in the future,
+ * but for now the focus is on getting things done in a simple fashion, and
+ * so the simple list search approach is good enough. But if you try to
+ * optimize, do not optimize the list search but rather introduce the hash
+ * table as second indexing structure! -- rgerhards, 2010-12-01
+ */
+struct ee_field*
+ee_getBucketField(struct ee_fieldbucket *bucket, es_str_t *name)
+{
+	struct ee_fieldbucket_listnode *node;
+
+	for(node = bucket->root ; node != NULL ; node = node->next) {
+		if(!es_strcmp(name, node->field->name))
+			break;
+	}
+
+	return((node == NULL) ? NULL : node->field);
+}
+
+
+int
+ee_getNumFieldVals(struct ee_field *field)
+{
+	assert(field != NULL);
+	return(field->nVals);
+}
+
+
+/* TODO: this function currently assumes that the field has a string
+ * representation, which for now is always true. Needs to be changed if
+ * we change the representation!
+ */
+es_str_t*
+ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
+{
+	es_str_t *str;
+	assert(field != NULL);
+
+	if(n >= field->nVals) {
+		str = NULL;
+		goto done;
+	}
+	if(n == 0) {
+		str = es_strdup(field->val->val.str);
+	} else {
+		assert(0); // TODO: implement!
+	}
+done:
+	return str;
 }

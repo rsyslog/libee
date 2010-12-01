@@ -41,6 +41,7 @@ ee_newValue(ee_ctx ctx)
 		goto done;
 	value->objID = ObjID_VALUE;
 	value->valtype = ee_valtype_none;
+	value->val.str = NULL;
 
 done:
 	return value;
@@ -51,6 +52,7 @@ void
 ee_deleteValue(struct ee_value *value)
 {
 	assert(value != NULL); assert(value->objID == ObjID_VALUE);
+	es_deleteStr(value->val.str);
 	free(value);
 }
 

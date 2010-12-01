@@ -148,7 +148,7 @@ ee_intDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 {
 	int r;
 	int lnNbr;
-	es_str_t *ln;
+	es_str_t *ln = NULL;
 	char typ;
 	es_str_t *value;
 	struct ee_event *event = NULL;
@@ -171,6 +171,7 @@ ee_intDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 			*errMsg = es_newStrFromCStr(errMsgBuf, errlen);
 			goto done;
 		}
+		free(ln);
 		r = cbGetLine(&ln);
 		lnNbr++;
 	}

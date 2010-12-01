@@ -227,7 +227,7 @@ ee_apacheDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 {
 	int r;
 	int lnNbr;
-	es_str_t *ln;
+	es_str_t *ln = NULL;
 	char errMsgBuf[1024];
 	size_t errlen;
 	
@@ -240,6 +240,7 @@ ee_apacheDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 			*errMsg = es_newStrFromCStr(errMsgBuf, errlen);
 			goto done;
 		}
+		free(ln);
 		r = cbGetLine(&ln);
 		lnNbr++;
 	}

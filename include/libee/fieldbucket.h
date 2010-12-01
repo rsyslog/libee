@@ -83,7 +83,7 @@ void ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket);
 /**
  * Add a field to the bucket.
  *
- * @memberof ee_tagbucket
+ * @memberof ee_fieldbucket
  * @public
  *
  * @param[in] bucket	the bucket to modify
@@ -93,5 +93,19 @@ void ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket);
  */
 int ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field);
 
+
+/**
+ * Obtain a field with specified name from given bucket.
+ *
+ * @memberof ee_fieldbucket
+ * @public
+ *
+ * @param bucket bucket to search
+ * @param[in] str name of field
+ *
+ * @return	NULL if field was not found (or an error occured);
+ *              pointer to the field otherwise
+ */
+struct ee_field* ee_getBucketField(struct ee_fieldbucket *bucket, es_str_t *name);
 
 #endif /* #ifndef LIBEE_FIELDBUCKET_H_INCLUDED */

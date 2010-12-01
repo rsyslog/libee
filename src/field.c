@@ -57,7 +57,21 @@ done:
 void
 ee_deleteField(struct ee_field *field)
 {
+	struct ee_valnode *node, *nodeDel;
+
 	assert(field->objID == ObjID_FIELD);
+	es_deleteStr(field->name);
+	if(field->nVals > 0) {
+		ee_deleteValue(field->val);
+	}
+	if(field->nVals > 1) {
+		node = field->valroot;
+		while(node != NULL) {
+			nodeDel = node;
+			ee_deleteValue(nodeDel->val);
+			free(nodeDel);
+		}
+	}
 	free(field);
 }
 
@@ -68,7 +82,7 @@ ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, struct ee_valu
 	assert(val->objID == ObjID_VALUE);
 	if((field = ee_newField(ctx)) == NULL) goto done;
 
-	if((field->name = strdup(name)) == NULL) {
+	if((field->name = es_newStrFromCStr(name, strlen(name))) == NULL) {
 		free(field);
 		field = NULL;
 		goto done;
