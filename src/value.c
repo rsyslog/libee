@@ -52,7 +52,8 @@ void
 ee_deleteValue(struct ee_value *value)
 {
 	assert(value != NULL); assert(value->objID == ObjID_VALUE);
-	es_deleteStr(value->val.str);
+	if(value->val.str != NULL)
+		es_deleteStr(value->val.str);
 	free(value);
 }
 
