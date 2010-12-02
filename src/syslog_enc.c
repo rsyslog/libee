@@ -134,7 +134,7 @@ ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
-	es_addBuf(str, "[cee@...", 8);
+	es_addBuf(str, "[cee@115", 8);
 	if(event->fields != NULL) {
 		for(node = event->fields->root ; node != NULL ; node = node->next) {
 			assert(node->field->objID == ObjID_FIELD);

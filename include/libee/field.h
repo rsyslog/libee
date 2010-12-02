@@ -49,7 +49,7 @@ struct ee_field {
 	unsigned objID;		/**< magic number to identify the object */
 	ee_ctx ctx;		/**< associated library context */
 	es_str_t *name;		/**< the field name */
-	unsigned short nVals;	/**< number of values */
+	unsigned char nVals;	/**< number of values */
 	struct ee_value *val;	/**< value assigned to this field */
 	struct ee_valnode *valroot;	/**< list for 2nd+ values */
 	struct ee_valnode *valtail;	/**< tail of the value list (for fast insert) */
