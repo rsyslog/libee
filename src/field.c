@@ -127,7 +127,7 @@ ee_addValueToField(struct ee_field *field, struct ee_value *val)
 	if(field->nVals == 0) {
 		field->nVals = 1;
 		field->val = val;
-	} else if(field->nVals == 65535) {
+	} else if(field->nVals == LIBEE_CEE_MAX_VALS_PER_FIELD) {
 		r = EE_TOOMANYVALUES;
 		goto done;
 	} else {

@@ -175,4 +175,9 @@
 #define EE_TOOMANYVALUES -6
 #define EE_WRONGPARSER -7
 
+/* some important constants */
+#define LIBEE_CEE_MAX_VALS_PER_FIELD 255
+	/**< CEE-defined maximum number of values per field. The
+	 * current value reflects CEE CLS 0.5.1
+	 */
 #endif /* #ifndef EE_H_INCLUDED */
