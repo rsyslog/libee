@@ -40,10 +40,11 @@
 static ee_ctx ctx;
 static FILE *fpIn;
 static int verbose = 0;
-enum codec { f_all, f_syslog, f_json, f_xml, f_int, f_apache };
+enum codec { f_all, f_syslog, f_json, f_xml, f_int, f_apache, f_csv };
 static enum codec encoder = f_syslog;
 static enum codec decoder = f_int;
 static es_str_t *decFmt = NULL; /**< a format string for decoder use */
+static es_str_t *encFmt = NULL; /**< a format string for encoder use */
 
 void
 dbgCallBack(void __attribute__((unused)) *cookie, char *msg,
@@ -88,7 +89,15 @@ static int cbNewEvt(struct ee_event *event)
 		free(cstr);
 		es_deleteStr(out);
 		break;
+	case f_csv:
+		ee_fmtEventToCSV(event, &out, encFmt);
+		cstr = es_str2cstr(out, NULL);
+		printf("%s\n", cstr);
+		free(cstr);
+		es_deleteStr(out);
+		break;
 	case f_all:
+	// TODO: add CSV!
 		printf("\n");
 		ee_fmtEventToRFC5424(event, &out);
 		cstr = es_str2cstr(out, NULL);
@@ -165,7 +174,7 @@ int main(int argc, char *argv[])
 	}
 	ee_setDebugCB(ctx, dbgCallBack, NULL);
 
-	while((opt = getopt(argc, argv, "c:i:ve:d:D:")) != -1) {
+	while((opt = getopt(argc, argv, "c:i:ve:E:d:D:")) != -1) {
 		switch (opt) {
 		case 'i':
 			if((fpIn = fopen(optarg, "r")) == NULL) {
@@ -181,6 +190,8 @@ int main(int argc, char *argv[])
 				encoder = f_json;
 			} else if(!strcmp(optarg, "xml")) {
 				encoder = f_xml;
+			} else if(!strcmp(optarg, "csv")) {
+				encoder = f_csv;
 			} else if(!strcmp(optarg, "syslog")) {
 				encoder = f_syslog;
 			} else if(!strcmp(optarg, "all")) {
@@ -196,6 +207,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'D': /* decoder-specific format string (will be validated by decoder) */ 
 			decFmt = es_newStrFromCStr(optarg, strlen(optarg));
+			break;
+		case 'E': /* encoder-specific format string (will be validated by encoder) */ 
+			encFmt = es_newStrFromCStr(optarg, strlen(optarg));
 			break;
 		case 'c': /* compactness of encoding */
 			if(!strcmp(optarg, "ultra")) {

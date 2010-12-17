@@ -198,4 +198,27 @@ int ee_fmtEventToJSON(struct ee_event *event, es_str_t **str);
  */
 int ee_fmtEventToXML(struct ee_event *event, es_str_t **str);
 
+
+/**
+ * Format an event to CSV format.
+ *
+ * This method takes an event and creates a new string representation
+ * in CSV format. The string is passed to the caller, which then
+ * is responsible for freeing it. Note that this methods needs a string
+ * specifying field names and order (as they shall be written to the
+ * output).
+ *
+ * <b>This is part of the ezAPI for libee</b>
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event to format
+ * @param[out] str pointer to string with XML representation, caller must destruct
+ * @param[in] extraData string with field names (comma-delimited list)
+
+ * @return	0 on success, something else otherwise.
+ */
+int ee_fmtEventToCSV(struct ee_event *event, es_str_t **str, es_str_t *extraData);
+
 #endif /* #ifndef LIBEE_EVENT_H_INCLUDED */
