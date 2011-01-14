@@ -102,6 +102,29 @@ int ee_parseWord(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struc
  */
 int ee_parseCharTo(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
 
+
+/** 
+ * Parse a quoted string.
+ */
+int ee_parseQuotedString(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
+/** 
+ * Parse an ISO date.
+ */
+int ee_parseISODate(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
+
+/** 
+ * Parse a timestamp in 12hr format.
+ */
+int ee_parseTime12hr(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
+
+/** 
+ * Parse a timestamp in 24hr format.
+ */
+int ee_parseTime24hr(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
 /** 
  * Parser for IPv4 addresses.
  */

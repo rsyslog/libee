@@ -1,5 +1,10 @@
 ----------------------------------------------------------------------
 Version 0.2.0 (rgerhards), 2010-12-??
+- added additional parsers
+  * Time12hr
+  * Time24hr
+  * ISODate
+  * QuotedString
 - added CSV encoder (very experimental)
 ----------------------------------------------------------------------
 Version 0.1.0 (rgerhards), 2010-12-09

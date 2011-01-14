@@ -470,6 +470,192 @@ done:	return r;
 ENDParser
 
 
+/**
+ * Parse a quoted string. In this initial implementation, escaping of the quote
+ * char is not supported. A quoted string is one start starts with a double quote,
+ * has some text (not containing double quotes) and ends with the first double
+ * quote character seen. The extracted string does NOT include the quote characters.
+ * rgerhards, 2011-01-14
+ */
+BEGINParser(QuotedString)
+	unsigned char *c;
+	es_size_t i;
+	es_str_t *valstr;
+
+	assert(str != NULL);
+	assert(offs != NULL);
+	c = es_getBufAddr(str);
+	i = *offs;
+
+	if(c[i] != '"')
+		goto done;
+	++i;
+
+	/* search end of string */
+	while(i < es_strlen(str) && c[i] != '"') 
+		i++;
+
+	if(i == es_strlen(str) || c[i] != '"') {
+		r = EE_WRONGPARSER;
+		goto done;
+	}
+
+	/* success, persist */
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs + 1, i - *offs - 1));
+	ee_setStrValue(*value, valstr);
+	*offs = i + 1; /* "eat" terminal double quote */
+
+	r = 0;
+
+done:	return r;
+ENDParser
+
+
+/**
+ * Parse an ISO date, that is YYYY-MM-DD (exactly this format).
+ * Note: we do manual loop unrolling -- this is fast AND efficient.
+ * rgerhards, 2011-01-14
+ */
+BEGINParser(ISODate)
+	unsigned char *c;
+	es_size_t i;
+	es_str_t *valstr;
+
+	assert(str != NULL);
+	assert(offs != NULL);
+	c = es_getBufAddr(str);
+	i = *offs;
+
+	if(*offs+10 > es_strlen(str))
+		goto done;	/* if it is not 10 chars, it can't be an ISO date */
+
+	/* year */
+	if(!isdigit(c[i])) goto done;
+	if(!isdigit(c[i+1])) goto done;
+	if(!isdigit(c[i+2])) goto done;
+	if(!isdigit(c[i+3])) goto done;
+	if(c[i+4] != '-') goto done;
+	/* month */
+	if(c[i+5] == '0') {
+		if(c[i+6] < '1' || c[i+6] > '9') goto done;
+	} else if(c[i+5] == '1') {
+		if(c[i+6] < '0' || c[i+6] > '2') goto done;
+	} else {
+		goto done;
+	}
+	if(c[i+7] != '-') goto done;
+	/* day */
+	if(c[i+8] == '0') {
+		if(c[i+9] < '1' || c[i+9] > '9') goto done;
+	} else if(c[i+8] == '1' || c[i+8] == '2') {
+		if(!isdigit(c[i+9])) goto done;
+	} else if(c[i+8] == '3') {
+		if(c[i+9] != '0' && c[i+9] != '1') goto done;
+	} else {
+		goto done;
+	}
+
+	/* success, persist */
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs, 10));
+	ee_setStrValue(*value, valstr);
+	*offs += 10;
+	r = 0;
+
+done:	return r;
+ENDParser
+
+/**
+ * Parse a timestamp in 24hr format (exactly HH:MM:SS).
+ * Note: we do manual loop unrolling -- this is fast AND efficient.
+ * rgerhards, 2011-01-14
+ */
+BEGINParser(Time24hr)
+	unsigned char *c;
+	es_size_t i;
+	es_str_t *valstr;
+
+	assert(str != NULL);
+	assert(offs != NULL);
+	c = es_getBufAddr(str);
+	i = *offs;
+
+	if(*offs+8 > es_strlen(str))
+		goto done;	/* if it is not 8 chars, it can't be us */
+
+	/* hour */
+	if(c[i] == '0' || c[i] == '1') {
+		if(!isdigit(c[i+1])) goto done;
+	} else if(c[i] == '2') {
+		if(c[i+1] < '0' || c[i+1] > '3') goto done;
+	} else {
+		goto done;
+	}
+	/* TODO: the code below is a duplicate of 24hr parser - create common function */
+	if(c[i+2] != ':') goto done;
+	if(c[i+3] < '0' || c[i+3] > '5') goto done;
+	if(!isdigit(c[i+4])) goto done;
+	if(c[i+5] != ':') goto done;
+	if(c[i+6] < '0' || c[i+6] > '5') goto done;
+	if(!isdigit(c[i+7])) goto done;
+
+	/* success, persist */
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs, 8));
+	ee_setStrValue(*value, valstr);
+	*offs += 8;
+	r = 0;
+
+done:	return r;
+ENDParser
+
+/**
+ * Parse a timestamp in 12hr format (exactly HH:MM:SS).
+ * Note: we do manual loop unrolling -- this is fast AND efficient.
+ * TODO: the code below is a duplicate of 24hr parser - create common function?
+ * rgerhards, 2011-01-14
+ */
+BEGINParser(Time12hr)
+	unsigned char *c;
+	es_size_t i;
+	es_str_t *valstr;
+
+	assert(str != NULL);
+	assert(offs != NULL);
+	c = es_getBufAddr(str);
+	i = *offs;
+
+	if(*offs+8 > es_strlen(str))
+		goto done;	/* if it is not 8 chars, it can't be us */
+
+	/* hour */
+	if(c[i] == '0') {
+		if(!isdigit(c[i+1])) goto done;
+	} else if(c[i] == '1') {
+		if(c[i+1] < '0' || c[i+1] > '2') goto done;
+	} else {
+		goto done;
+	}
+	if(c[i+2] != ':') goto done;
+	if(c[i+3] < '0' || c[i+3] > '5') goto done;
+	if(!isdigit(c[i+4])) goto done;
+	if(c[i+5] != ':') goto done;
+	if(c[i+6] < '0' || c[i+6] > '5') goto done;
+	if(!isdigit(c[i+7])) goto done;
+
+	/* success, persist */
+	CHKN(*value = ee_newValue(ctx));
+	CHKN(valstr = es_newStrFromSubStr(str, *offs, 8));
+	ee_setStrValue(*value, valstr);
+	*offs += 8;
+	r = 0;
+
+done:	return r;
+ENDParser
+
+
+
 
 /* helper to IPv4 address parser, checks the next set of numbers.
  * Syntax 1 to 3 digits, value together not larger than 255.
