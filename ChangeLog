@@ -1,11 +1,12 @@
 ----------------------------------------------------------------------
-Version 0.2.0 (rgerhards), 2010-12-??
+Version 0.2.0 (rgerhards), 2011-04-01
 - added additional parsers
   * Time12hr
   * Time24hr
   * ISODate
   * QuotedString
 - added CSV encoder (very experimental)
+- removed dependency on libxml (which we currently do not need)
 ----------------------------------------------------------------------
 Version 0.1.0 (rgerhards), 2010-12-09
 Initial public release.

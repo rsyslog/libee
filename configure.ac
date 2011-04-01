@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([libee], [0.1.0], [rgerhards@adiscon.com])
+AC_INIT([libee], [0.2.0], [rgerhards@adiscon.com])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/ctx.c])
@@ -24,23 +24,30 @@ LIBS=
 #rt_libs=$LIBS
 LIBS=$save_LIBS
 
-AC_CHECK_PROG(
-  [HAVE_LIBXML2_CONFIG],
-  [xml2-config],
-  [yes],,,
-)
-if test "x${HAVE_LIBXML2_CONFIG}" != "xyes"; then
-  AC_MSG_FAILURE([xml2-config not found in PATH - this means libxml2 development package is missing])
-fi
-AC_CHECK_LIB(
-  [xml2],
-  [xmlReadFile],
-  [LIBXML2_CFLAGS=`xml2-config --cflags`
-   LIBXML2_LIBS=`xml2-config --libs`
-  ],
-  [AC_MSG_FAILURE([libxml2 is missing])],
-  [`xml2-config --libs`]
-)
+# We CURRENTLY do NOT need libxml, but this will change at a later stage.
+# If we need libxml, we need it for features which some may not find essential.
+# The idea is to make these features optional, and thus save the libxml dependency
+# under some circumstances. This will be added as need arises. As such, for
+# the time being, we simply comment out the code. Please do not remove it,
+# as we will  need it back in again some time in the future.
+# rgerhards, 2011-04-01 (NOT an april fools day joke!)
+#AC_CHECK_PROG(
+#  [HAVE_LIBXML2_CONFIG],
+#  [xml2-config],
+#  [yes],,,
+#)
+#if test "x${HAVE_LIBXML2_CONFIG}" != "xyes"; then
+#  AC_MSG_FAILURE([xml2-config not found in PATH - this means libxml2 development package is missing])
+#fi
+#AC_CHECK_LIB(
+#  [xml2],
+#  [xmlReadFile],
+#  [LIBXML2_CFLAGS=`xml2-config --cflags`
+#   LIBXML2_LIBS=`xml2-config --libs`
+#  ],
+#  [AC_MSG_FAILURE([libxml2 is missing])],
+#  [`xml2-config --libs`]
+#)
 AC_SUBST(LIBXML2_CFLAGS)
 AC_SUBST(LIBXML2_LIBS)
 
