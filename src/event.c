@@ -2,7 +2,7 @@
  * @file event.c
  * Implements event object methods.
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010,2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -73,7 +73,28 @@ ee_deleteEvent(struct ee_event *event)
 
 
 int
-ee_addTagToEvent(struct ee_event *event, char *tag)
+ee_assignTagbucketToEvent(struct ee_event *event, struct ee_tagbucket *tagbucket)
+{
+	int r = -1;
+
+	assert(event != NULL);
+	if(tagbucket == NULL) {
+		r = EE_EINVAL;
+		goto done;
+	}
+
+	if(event->tags != NULL)
+		ee_deleteTagbucket(event->tags);
+
+	event->tags = tagbucket;
+	
+done:
+	return r;
+}
+
+
+int
+ee_addTagToEvent(struct ee_event *event, es_str_t *tag)
 {
 	int r = -1;
 
@@ -82,7 +103,7 @@ ee_addTagToEvent(struct ee_event *event, char *tag)
 		if((event->tags = ee_newTagbucket(event->ctx)) == NULL)
 			goto done;
 
-	r = ee_addTagToBucket(event->tags, strdup(tag));
+	r = ee_addTagToBucket(event->tags, es_strdup(tag));
 	
 done:
 	return r;

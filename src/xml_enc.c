@@ -151,6 +151,24 @@ done:
 }
 
 
+static inline int
+ee_addTags_XML(struct ee_tagbucket *tags, es_str_t **str)
+{
+	int r = 0;
+	struct ee_tagbucket_listnode *tag;
+
+	CHKR(es_addBuf(str, "<tags>", 6));
+	for(tag = tags->root ; tag != NULL ; tag = tag->next) {
+		CHKR(es_addBuf(str, "<tag>", 5));
+		CHKR(es_addStr(str, tag->name));
+		CHKR(es_addBuf(str, "</tag>", 6));
+	}
+	CHKR(es_addBuf(str, "</tags>", 7));
+
+done:	return r;
+}
+
+
 int
 ee_fmtEventToXML(struct ee_event *event, es_str_t **str)
 {
@@ -161,6 +179,9 @@ ee_fmtEventToXML(struct ee_event *event, es_str_t **str)
 	if((*str = es_newStr(256)) == NULL) goto done;
 
 	es_addBuf(str, "<event>", 7);
+	if(event->tags != NULL) {
+		CHKR(ee_addTags_XML(event->tags, str));
+	}
 	if(event->fields != NULL) {
 		for(node = event->fields->root ; node != NULL ; node = node->next) {
 			assert(node->field->objID == ObjID_FIELD);

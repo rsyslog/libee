@@ -174,6 +174,7 @@
 #define EE_FIELDHASNAME -5
 #define EE_TOOMANYVALUES -6
 #define EE_WRONGPARSER -7
+#define EE_EINVAL -8 		/* invalid value provided on API */
 
 /* some important constants */
 #define LIBEE_CEE_MAX_VALS_PER_FIELD 255

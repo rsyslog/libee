@@ -1,4 +1,8 @@
 ----------------------------------------------------------------------
+Version 0.3.0 (rgerhards), 2011-04-??
+- extended API
+- improved support for tags
+----------------------------------------------------------------------
 Version 0.2.0 (rgerhards), 2011-04-01
 - added additional parsers
   * Time12hr

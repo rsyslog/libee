@@ -50,18 +50,37 @@ ee_newTagbucket(ee_ctx ctx)
 	tagbucket->objID = ObjID_TAGBUCKET;
 	tagbucket->ctx = ctx;
 	tagbucket->root = tagbucket->tail = NULL;
+	tagbucket->refCount = 1;
 
 done:	return tagbucket;
+}
+
+
+/* Add an additional reference to the tag bucket.
+ * TODO: atomic instructions for ref counting! -- rgerhards, 2011-04-06
+ */
+struct ee_tagbucket*
+ee_addRefTagbucket(struct ee_tagbucket *tagbucket)
+{
+	assert(tagbucket->objID == ObjID_TAGBUCKET);
+	tagbucket->refCount++;
+	return tagbucket;
 }
 
 
 void
 ee_deleteTagbucket(struct ee_tagbucket *tagbucket)
 {
+	int currRefCount;
+
+	// TODO: use atomic instructions for reference counting!
 	assert(tagbucket->objID == ObjID_TAGBUCKET);
-	tagbucket->objID = ObjID_DELETED;
-	// TODO: free list (memleak)
-	free(tagbucket);
+	currRefCount = tagbucket->refCount--;
+	if(currRefCount == 0) {
+		tagbucket->objID = ObjID_DELETED;
+		// TODO: free list (memleak)
+		free(tagbucket);
+	}
 }
 
 
@@ -85,7 +104,7 @@ done:
 
 /* TODO: when in validating mode, check duplicate field entries */
 int
-ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname)
+ee_addTagToBucket(struct ee_tagbucket *tagbucket, es_str_t *tagname)
 {
 	int r;
 	struct ee_tagbucket_listnode *node;

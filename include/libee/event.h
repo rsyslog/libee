@@ -6,7 +6,7 @@
  *//*
  *
  * Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010,2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -64,6 +64,27 @@ void ee_deleteEvent(struct ee_event *event);
 
 
 /**
+ * Assign a tag bucket to an event.
+ *
+ * A complete tag bucket is assigned to the event. Any previously
+ * assigned tags are DISCARDED.
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event where tag shall be added
+ * @param tagbucket  already-created tag bucket to be assigned to event.
+ * 		The caller ceases control of this bucket. In particular,
+ * 		we may destruct it at any time. If the caller intends to
+ * 		continue access the tagbucket, it must properly create
+ * 		a duplicate.
+ *
+ * @return	0 on success, something else otherwise.
+ */
+int ee_assignTagbucketToEvent(struct ee_event *event, struct ee_tagbucket *tagbucket);
+
+
+/**
  * Add a tag to the event.
  *
  * The tag is provided as a string. If no tag bucket exists when
@@ -81,7 +102,7 @@ void ee_deleteEvent(struct ee_event *event);
  *
  * @return	0 on success, something else otherwise.
  */
-int ee_addTagToEvent(struct ee_event *event, char *tag);
+int ee_addTagToEvent(struct ee_event *event, es_str_t *tag);
 
 
 /**

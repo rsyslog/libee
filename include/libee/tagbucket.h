@@ -33,7 +33,7 @@
  * Internal structure to represent linked list nodes for the tagbucket.
  */
 struct ee_tagbucket_listnode {
-	char *name;	/* TODO: use es_str_t! */
+	es_str_t *name;
 	struct ee_tagbucket_listnode *next;
 };
 
@@ -45,6 +45,7 @@ struct ee_tagbucket {
 	ee_ctx ctx;		/**< associated library context */
 	struct ee_tagbucket_listnode *root; /**< root of our tags list */
 	struct ee_tagbucket_listnode *tail; /**< list tail to speed up adding nodes */
+	unsigned refCount;
 };
 
 /**
@@ -58,6 +59,22 @@ struct ee_tagbucket {
  * @return newly created object or NULL if an error occured
  */
 struct ee_tagbucket* ee_newTagbucket(ee_ctx ctx);
+
+
+/**
+ * Add an additional reference to the tagbucket. Use this whenever
+ * an additional part of the code needs a READ-ONLY copy of the
+ * tag bucket. Note: The delete function checks the reference count and
+ * only deletes if it is down to zero.
+ *
+ * @memberof ee_tagbucket
+ * @public
+ *
+ * @param[in] tagbucket the tagbucket to add ref for
+ *
+ * @return address of ref-added tagbucket (for convenience)
+ */
+struct ee_tagbucket* ee_addRefTagbucket(struct ee_tagbucket *tagbucket);
 
 /**
  * Destructor for the ee_tagbucket object.
@@ -80,7 +97,7 @@ void ee_deleteTagbucket(struct ee_tagbucket *tagbucket);
  *
  * @return 0 on success, something else otherwise
  */
-int ee_addTagToBucket(struct ee_tagbucket *tagbucket, char *tagname);
+int ee_addTagToBucket(struct ee_tagbucket *tagbucket, es_str_t *tagname);
 
 
 /**

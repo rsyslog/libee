@@ -172,6 +172,29 @@ done:
 }
 
 
+static inline int
+ee_addTags_JSON(struct ee_tagbucket *tags, es_str_t **str)
+{
+	int r = 0;
+	struct ee_tagbucket_listnode *tag;
+	int needComma = 0;
+
+	CHKR(es_addBuf(str, "\"tags\":[", 8));
+	for(tag = tags->root ; tag != NULL ; tag = tag->next) {
+		if(needComma)
+			es_addChar(str, ',');
+		else
+			needComma = 1;
+		es_addChar(str, '"');
+		CHKR(es_addStr(str, tag->name));
+		es_addChar(str, '"');
+	}
+	es_addChar(str, ']');
+
+done:	return r;
+}
+
+
 int
 ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 {
@@ -182,7 +205,12 @@ ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 	if((*str = es_newStr(256)) == NULL) goto done;
 
 	es_addChar(str, '{');
+	if(event->tags != NULL) {
+		CHKR(ee_addTags_JSON(event->tags, str));
+	}
 	if(event->fields != NULL) {
+		if(event->tags != NULL) 
+			CHKR(es_addBuf(str, ", ", 2));
 		for(node = event->fields->root ; node != NULL ; node = node->next) {
 			assert(node->field->objID == ObjID_FIELD);
 #ifdef NO_EMPTY_FIELDS
