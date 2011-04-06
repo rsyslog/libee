@@ -156,3 +156,14 @@ done:
 
 	return r;
 }
+
+int
+ee_EventHasTag(struct ee_event *event, es_str_t *tagname)
+{
+	int r;
+	if(event->tags == NULL)
+		r = 0;
+	else
+		r = ee_TagbucketHasTag(event->tags, tagname);
+	return r;
+}

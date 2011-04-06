@@ -99,21 +99,17 @@ void ee_deleteTagbucket(struct ee_tagbucket *tagbucket);
  */
 int ee_addTagToBucket(struct ee_tagbucket *tagbucket, es_str_t *tagname);
 
-
 /**
- * Iterate over all tags inside the bucket and call a user-defined function
- * on each tag.
+ * Check if the tagbucket contains a specific tag.
  *
  * @memberof ee_tagbucket
  * @public
  *
- * @param[in] tagbucket	the tagbucket to modify
- * @param[in] f	function to be called, must accept cookie as first param,
- * 		pointer to tag name as second.
- * @param[in] cookie cookie to be passed to user-defined function
+ * @param[in] tagbucket	the tagbucket to check
+ * @param[in] tagname	name of the tag
  *
- * @return number of tags processed (= nbr of function calls)
+ * @return 0 if tag not present, something else otherwise
  */
-void ee_iterateOverBucketTags(struct ee_tagbucket *tagbucket, void(*f)(void*,char *), void *cookie);
+int ee_BucketHasTag(struct ee_tagbucket *tagbucket, es_str_t *tagname);
 
 #endif /* #ifndef LIBEE_TAGBUCKET_H_INCLUDED */

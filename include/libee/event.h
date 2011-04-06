@@ -161,6 +161,21 @@ ee_getEventField(struct ee_event *event, es_str_t *name)
 
 
 /**
+ * Check if an event is classified via a specific tag.
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event to look at
+ * @param[in] str name of tag
+ *
+ * @return	0 if event is not classified with the tag, something
+ * 		else otherwise
+ */
+int ee_EventHasTag(struct ee_event *event, es_str_t *tagname);
+
+
+/**
  * Format an event in syslog RFC 5424 format.
  *
  * This method takes an event and creates a new string representation
