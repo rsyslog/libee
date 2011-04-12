@@ -179,7 +179,7 @@ ee_addTags_JSON(struct ee_tagbucket *tags, es_str_t **str)
 	struct ee_tagbucket_listnode *tag;
 	int needComma = 0;
 
-	CHKR(es_addBuf(str, "\"tags\":[", 8));
+	CHKR(es_addBuf(str, "\"event.tags\":[", 14));
 	for(tag = tags->root ; tag != NULL ; tag = tag->next) {
 		if(needComma)
 			es_addChar(str, ',');

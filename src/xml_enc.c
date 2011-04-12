@@ -157,13 +157,13 @@ ee_addTags_XML(struct ee_tagbucket *tags, es_str_t **str)
 	int r = 0;
 	struct ee_tagbucket_listnode *tag;
 
-	CHKR(es_addBuf(str, "<tags>", 6));
+	CHKR(es_addBuf(str, "<event.tags>", 12));
 	for(tag = tags->root ; tag != NULL ; tag = tag->next) {
 		CHKR(es_addBuf(str, "<tag>", 5));
 		CHKR(es_addStr(str, tag->name));
 		CHKR(es_addBuf(str, "</tag>", 6));
 	}
-	CHKR(es_addBuf(str, "</tags>", 7));
+	CHKR(es_addBuf(str, "</event.tags>", 13));
 
 done:	return r;
 }

@@ -1,4 +1,7 @@
 ----------------------------------------------------------------------
+Version 0.3.1 (rgerhards), 2011-04-06
+- brought tag handling a bit inline with upcoming 0.6 draft CEE spec
+----------------------------------------------------------------------
 Version 0.3.0 (rgerhards), 2011-04-06
 - extended API
 - added support for tags
