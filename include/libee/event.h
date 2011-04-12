@@ -153,11 +153,7 @@ int ee_addFieldToEvent(struct ee_event *event, struct ee_field *field);
  * @return	NULL if field was not found (or an error occured);
  *              pointer to the field otherwise
  */
-static inline struct ee_field*
-ee_getEventField(struct ee_event *event, es_str_t *name)
-{
-	return(ee_getBucketField(event->fields, name));
-}
+struct ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
 
 
 /**

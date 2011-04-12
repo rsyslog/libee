@@ -167,3 +167,9 @@ ee_EventHasTag(struct ee_event *event, es_str_t *tagname)
 		r = ee_TagbucketHasTag(event->tags, tagname);
 	return r;
 }
+
+struct ee_field*
+ee_getEventField(struct ee_event *event, es_str_t *name)
+{
+	return(ee_getBucketField(event->fields, name));
+}
