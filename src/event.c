@@ -77,8 +77,7 @@ ee_assignTagbucketToEvent(struct ee_event *event, struct ee_tagbucket *tagbucket
 {
 	int r = -1;
 
-	assert(event != NULL);
-	if(tagbucket == NULL) {
+	if(event == NULL || tagbucket == NULL) {
 		r = EE_EINVAL;
 		goto done;
 	}
@@ -168,8 +167,57 @@ ee_EventHasTag(struct ee_event *event, es_str_t *tagname)
 	return r;
 }
 
+
 struct ee_field*
 ee_getEventField(struct ee_event *event, es_str_t *name)
 {
 	return(ee_getBucketField(event->fields, name));
+}
+
+
+/* TODO: this function should use the default encoder. However, none of
+ * that plumbing currently exists. So the current implementation is just
+ * a quick skeleton, which needs to be extended severely (but it still
+ * is useful).
+ */
+int
+ee_getEventFieldAsString(struct ee_event *event, es_str_t *name, es_str_t **strVal)
+{
+	int r = EE_ERR;
+	struct ee_field *f;
+	struct ee_tagbucket_listnode *tag;
+	int needComma = 0;
+
+	/* checking event.tags is a hack and will be removed with the
+	 * next version when I change the internal representation of
+	 * tags (to keep them in line with current CEE developments).
+	 * TODO -- rgerhards, 2011-04-12
+	 */
+	if(!es_strbufcmp(name, (unsigned char*) "event.tags", 10)) {
+		if(event->tags == NULL) {
+			r = EE_NOTFOUND;
+			goto done;
+		}
+		if(*strVal == NULL) {
+			CHKN(*strVal = es_newStr(16));
+		}
+		for(tag = event->tags->root ; tag != NULL ; tag = tag->next) {
+			if(needComma) {
+				CHKR(es_addChar(strVal, ','));
+			} else {
+				needComma = 1;
+			}
+			CHKR(es_addStr(strVal, tag->name));
+		}
+	} else {
+		f = ee_getBucketField(event->fields, name);
+		if(f == NULL) {
+			r = EE_NOTFOUND;
+			goto done;
+		}
+		CHKR(ee_getFieldAsString(f, strVal));
+	}
+
+done:
+	return r;
 }

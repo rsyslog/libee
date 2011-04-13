@@ -146,3 +146,66 @@ ee_addValueToField(struct ee_field *field, struct ee_value *val)
 done:
 	return r;
 }
+
+
+int
+ee_getNumFieldVals(struct ee_field *field)
+{
+	assert(field != NULL);
+	return(field->nVals);
+}
+
+
+/* TODO: this function currently assumes that the field has a string
+ * representation, which for now is always true. Needs to be changed if
+ * we change the representation!
+ */
+es_str_t*
+ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
+{
+	es_str_t *str;
+	assert(field != NULL);
+
+	if(n >= field->nVals) {
+		str = NULL;
+		goto done;
+	}
+	if(n == 0) {
+		str = es_strdup(field->val->val.str);
+	} else {
+		assert(0); // TODO: implement!
+	}
+done:
+	return str;
+}
+
+
+/* TODO: this function currently assumes that the field has a string
+ * representation, which for now is always true. Needs to be changed if
+ * we change the representation!
+ * TODO: implement (default) encoder interface
+ */
+int
+ee_getFieldAsString(struct ee_field *field, es_str_t **str)
+{
+	int r = EE_ERR;
+	struct ee_valnode *node;
+	assert(field != NULL);
+
+	if(*str == NULL) {
+		CHKN(*str = es_newStr(16));
+	}
+
+	if(field->nVals == 0) {
+		goto done;
+	}
+	/* first value needs to be treated seperately */
+	CHKR(es_addStr(str, field->val->val.str));
+
+	/* on to the rest */
+	for(node = field->valroot ; node != NULL ; node = node->next) {
+		CHKR(es_addStr(str, node->val->val.str));
+	}
+
+done:	return r;
+}

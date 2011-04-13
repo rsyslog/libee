@@ -157,6 +157,29 @@ struct ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
 
 
 /**
+ * Obtain the string representaton of a field with specified name
+ * from given event. The string representation is build in the current
+ * default encoding (note: different encodings are NOT yet implemented
+ * at the time of this writing).
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param event event to search
+ * @param[in] name name of field
+ * @param[out] strVal output string with field representation. If NULL
+ *                    a new string is generated, the representation
+ *                    is APPENDED to the existing string.
+ *
+ * @return	0 (EE_OK), if everything went well, EE_NOTFOUND if the
+ * 		field could not be found and something else for other
+ * 		errors.
+ */
+int ee_getEventFieldAsString(struct ee_event *event,
+		es_str_t *name, es_str_t **strVal);
+
+
+/**
  * Check if an event is classified via a specific tag.
  *
  * @memberof ee_event

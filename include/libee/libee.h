@@ -167,7 +167,8 @@
 
 /* some private error codes (always negative)
  */
-#define E_ERR -1
+#define EE_OK 0
+#define EE_ERR -1
 #define EE_NOMEM -2
 #define EE_EOF -3
 #define EE_INVLDFMT -4
@@ -175,6 +176,7 @@
 #define EE_TOOMANYVALUES -6
 #define EE_WRONGPARSER -7
 #define EE_EINVAL -8 		/* invalid value provided on API */
+#define EE_NOTFOUND -9 		/* some object could not be found */
 
 /* some important constants */
 #define LIBEE_CEE_MAX_VALS_PER_FIELD 255

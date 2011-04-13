@@ -115,35 +115,3 @@ ee_getBucketField(struct ee_fieldbucket *bucket, es_str_t *name)
 
 	return((node == NULL) ? NULL : node->field);
 }
-
-
-int
-ee_getNumFieldVals(struct ee_field *field)
-{
-	assert(field != NULL);
-	return(field->nVals);
-}
-
-
-/* TODO: this function currently assumes that the field has a string
- * representation, which for now is always true. Needs to be changed if
- * we change the representation!
- */
-es_str_t*
-ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
-{
-	es_str_t *str;
-	assert(field != NULL);
-
-	if(n >= field->nVals) {
-		str = NULL;
-		goto done;
-	}
-	if(n == 0) {
-		str = es_strdup(field->val->val.str);
-	} else {
-		assert(0); // TODO: implement!
-	}
-done:
-	return str;
-}

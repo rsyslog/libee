@@ -185,4 +185,22 @@ int ee_getNumFieldVals(struct ee_field *field);
  */
 es_str_t* ee_getFieldValueAsStr(struct ee_field *field, unsigned short n);
 
+/**
+ * Obtain the string representaton of a field.
+ * The string representation is build in the current
+ * default encoding (note: different encodings are NOT yet implemented
+ * at the time of this writing).
+ *
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] field relevant field
+ * @param[out] str output string with field representation. If NULL
+ *                    a new string is generated, the representation
+ *                    is APPENDED to the existing string.
+ *
+ * @returns 0 (EE_OK) on success, error code otherwise
+ */
+int ee_getFieldAsString(struct ee_field *field, es_str_t **str);
+
 #endif /* #ifndef LIBEE_FIELD_H_INCLUDED */
