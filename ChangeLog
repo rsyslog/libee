@@ -1,4 +1,8 @@
 ----------------------------------------------------------------------
+Version 0.3.2 (rgerhards), 2011-04-??
+- bugfix: compile problems under Solaris
+  closes: http://bugzilla.adiscon.com/show_bug.cgi?id=253
+----------------------------------------------------------------------
 Version 0.3.1 (rgerhards), 2011-04-18
 - API extensions
 - brought tag handling a bit inline with upcoming 0.6 draft CEE spec

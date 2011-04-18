@@ -28,6 +28,7 @@
  */
 #ifndef LIBEE_TIMESTAMP_H_INCLUDED
 #define	LIBEE_TIMESTAMP_H_INCLUDED
+#include <time.h> /* needed for Solaris */
 
 /**
  * An object to represent a CEE/XML timestamp.
