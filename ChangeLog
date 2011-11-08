@@ -1,5 +1,7 @@
 ----------------------------------------------------------------------
 Version 0.3.2 (rgerhards), 2011-04-??
+- added additional parser
+  * RFC5424Date
 - bugfix: compile problems under Solaris
   closes: http://bugzilla.adiscon.com/show_bug.cgi?id=253
 ----------------------------------------------------------------------

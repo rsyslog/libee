@@ -81,6 +81,11 @@ void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
 
 
 /** 
+ * Parser for RFC5424 date.
+ */
+int ee_parseRFC5424Date(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+
+/** 
  * Parser for RFC3164 date.
  */
 int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);

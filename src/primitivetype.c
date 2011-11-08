@@ -117,6 +117,140 @@ int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, es_s
 }
 
 
+
+
+/**
+ * Parse a TIMESTAMP as specified in RFC5424 (subset of RFC3339).
+ */
+BEGINParser(RFC5424Date)
+	unsigned char *pszTS;
+	/* variables to temporarily hold time information while we parse */
+	int year;
+	int month;
+	int day;
+	int hour; /* 24 hour clock */
+	int minute;
+	int second;
+	int secfrac;	/* fractional seconds (must be 32 bit!) */
+	int secfracPrecision;
+	char OffsetMode;	/* UTC offset + or - */
+	char OffsetHour;	/* UTC offset in hours */
+	int OffsetMinute;	/* UTC offset in minutes */
+	es_size_t len;
+	es_size_t orglen;
+	/* end variables to temporarily hold time information while we parse */
+
+	assert(*offs < es_strlen(str));
+
+	pszTS = es_getBufAddr(str) + *offs;
+	len = orglen = es_strlen(str) - *offs;
+
+	year = hParseInt(&pszTS, &len);
+
+	/* We take the liberty to accept slightly malformed timestamps e.g. in 
+	 * the format of 2003-9-1T1:0:0.  */
+	if(len == 0 || *pszTS++ != '-') goto fail;
+	--len;
+	month = hParseInt(&pszTS, &len);
+	if(month < 1 || month > 12) goto fail;
+
+	if(len == 0 || *pszTS++ != '-')
+		goto fail;
+	--len;
+	day = hParseInt(&pszTS, &len);
+	if(day < 1 || day > 31) goto fail;
+
+	if(len == 0 || *pszTS++ != 'T') goto fail;
+	--len;
+
+	hour = hParseInt(&pszTS, &len);
+	if(hour < 0 || hour > 23) goto fail;
+
+	if(len == 0 || *pszTS++ != ':')
+		goto fail;
+	--len;
+	minute = hParseInt(&pszTS, &len);
+	if(minute < 0 || minute > 59) goto fail;
+
+	if(len == 0 || *pszTS++ != ':') goto fail;
+	--len;
+	second = hParseInt(&pszTS, &len);
+	if(second < 0 || second > 60) goto fail;
+
+	/* Now let's see if we have secfrac */
+	if(len > 0 && *pszTS == '.') {
+		--len;
+		unsigned char *pszStart = ++pszTS;
+		secfrac = hParseInt(&pszTS, &len);
+		secfracPrecision = (int) (pszTS - pszStart);
+	} else {
+		secfracPrecision = 0;
+		secfrac = 0;
+	}
+
+	/* check the timezone */
+	if(len == 0) goto fail;
+
+	if(*pszTS == 'Z') {
+		--len;
+		pszTS++; /* eat Z */
+		OffsetMode = 'Z';
+		OffsetHour = 0;
+		OffsetMinute = 0;
+	} else if((*pszTS == '+') || (*pszTS == '-')) {
+		OffsetMode = *pszTS;
+		--len;
+		pszTS++;
+
+		OffsetHour = hParseInt(&pszTS, &len);
+		if(OffsetHour < 0 || OffsetHour > 23)
+			goto fail;
+
+		if(len == 0 || *pszTS++ != ':')
+			goto fail;
+		OffsetMinute = hParseInt(&pszTS, &len);
+		if(OffsetMinute < 0 || OffsetMinute > 59)
+			goto fail;
+	} else {
+		/* there MUST be TZ information */
+		goto fail;
+	}
+
+	if(len > 0) {
+		if(*pszTS != ' ') /* if it is not a space, it can not be a "good" time */
+			goto fail;
+		++pszTS; /* just skip past it */
+		--len;
+	}
+
+	/* we had success, so update parse pointer and caller-provided timestamp */
+	es_size_t usedLen =  orglen - len;
+	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
+	*value = ee_newValue(ctx);
+	ee_setStrValue(*value, valstr);
+	*offs += usedLen;
+	r = 0; /* parsing was successful */
+#	if 0 /* currently, we need to persist only the string format */
+	/* we had success, so update parse pointer and caller-provided timestamp */
+	*ppszTS = pszTS;
+	pTime->timeType = 2;
+	pTime->year = year;
+	pTime->month = month;
+	pTime->day = day;
+	pTime->hour = hour;
+	pTime->minute = minute;
+	pTime->second = second;
+	pTime->secfrac = secfrac;
+	pTime->secfracPrecision = secfracPrecision;
+	pTime->OffsetMode = OffsetMode;
+	pTime->OffsetHour = OffsetHour;
+	pTime->OffsetMinute = OffsetMinute;
+#	endif
+
+fail:
+ENDParser
+
+
 /**
  * Parse a RFC3164 Date.
  */
@@ -276,9 +410,7 @@ BEGINParser(RFC3164Date)
 		goto fail;
 	--len;
 
-	/* we accept a slightly malformed timestamp when receiving. This is
-	 * we accept one-digit days
-	 */
+	/* we accept a slightly malformed timestamp with one-digit days. */
 	if(*p == ' ') {
 		--len;
 		++p;
@@ -334,10 +466,7 @@ BEGINParser(RFC3164Date)
 		--len;
 	}
 
-	/* we had success, so update parse pointer and caller-provided timestamp
-	 * fields we do not have are not updated in the caller's timestamp. This
-	 * is the reason why the caller must pass in a correct timestamp.
-	 */
+	/* we had success, so update parse pointer and caller-provided timestamp */
 	es_size_t usedLen =  orglen - len;
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
 	*value = ee_newValue(ctx);
