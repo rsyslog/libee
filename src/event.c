@@ -33,6 +33,7 @@
 #include "libee/internal.h"
 #include "libee/field.h"
 #include "libee/value.h"
+#include "libee/tagbucket.h"
 
 #define ERR_ABORT {r = 1; goto done; }
 
@@ -75,7 +76,7 @@ ee_deleteEvent(struct ee_event *event)
 int
 ee_assignTagbucketToEvent(struct ee_event *event, struct ee_tagbucket *tagbucket)
 {
-	int r = -1;
+	int r = 0;
 
 	if(event == NULL || tagbucket == NULL) {
 		r = EE_EINVAL;
@@ -220,4 +221,11 @@ ee_getEventFieldAsString(struct ee_event *event, es_str_t *name, es_str_t **strV
 
 done:
 	return r;
+}
+
+
+void
+ee_EventGetTagbucket(struct ee_event *event, struct ee_tagbucket **tagbucket)
+{
+	*tagbucket = event->tags;
 }

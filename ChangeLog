@@ -1,9 +1,21 @@
 ----------------------------------------------------------------------
 Version 0.3.2 (rgerhards), 2011-04-??
+- API enhancements:
+  * added capability to enumerate tags inside a tagbucket
+  * added capability to obtain tagbucket for an event
+    --> ee_EventGetTagbucket()
 - added additional parser
   * RFC5424Date
+- potentially problematic API change: in earlier versions, the 
+  function ee_TagbucketHasTag() was errornously name ee_BucketHasTag().
+  This has been corrected, potentially resulting in API
+  incompatibility. We have accepted this, because we are at level 0.x
+  AND know that potentially no current user has ever used this
+  function, but instead the upper-layer equivalents. But if thinks
+  break, you now know why ;)
 - bugfix: compile problems under Solaris
   closes: http://bugzilla.adiscon.com/show_bug.cgi?id=253
+- bugfix: ee_EventGetTagbucket() always returned -1 (error)
 ----------------------------------------------------------------------
 Version 0.3.1 (rgerhards), 2011-04-18
 - API extensions

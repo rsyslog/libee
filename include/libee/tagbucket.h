@@ -6,7 +6,7 @@
  *//*
  *
  * Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -110,6 +110,28 @@ int ee_addTagToBucket(struct ee_tagbucket *tagbucket, es_str_t *tagname);
  *
  * @return 0 if tag not present, something else otherwise
  */
-int ee_BucketHasTag(struct ee_tagbucket *tagbucket, es_str_t *tagname);
+int ee_TagbucketHasTag(struct ee_tagbucket *tagbucket, es_str_t *tagname);
+
+/**
+ * Iterate over all tags inside a tag bucket.
+ * On initial entry, cookie must be set to zero. The cookie returned
+ * from each call must be passed into the next call. If the returned 
+ * cookie is NULL, no more tags are available (this may happen immediately
+ * if the tag bucket is empty). So the proper terminating condition to
+ * check for is returned cookie == NULL. The actual return code
+ * shall only be check for errors. Note that it is NOT permitted and
+ * can lead to fatal errors if the tagbucket is changed between calls.
+ * If the tagbucket changes, an initial call with a NULL-cookie must be
+ * made.
+ *
+ * @memberof ee_value
+ * @public
+ *
+ * @param[in] tagbucket tagbucket to process
+ * @param[in/out] cookie cookie - for details see description
+ * @param[out] tagname name of tag
+ * @return 0 if tag not present, something else otherwise
+ */
+int ee_TagbucketGetNextTag(struct ee_tagbucket *tagbucket, void **cookie, es_str_t **tagname);
 
 #endif /* #ifndef LIBEE_TAGBUCKET_H_INCLUDED */

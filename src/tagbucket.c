@@ -2,7 +2,7 @@
  * @file tagbucket.c
  * Implements tagbucket object methods.
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -104,6 +104,28 @@ ee_addTagToBucket(struct ee_tagbucket *tagbucket, es_str_t *tagname)
 	r = 0;
 
 done:	return r;
+}
+
+
+int
+ee_TagbucketGetNextTag(struct ee_tagbucket *tagbucket, void **cookie, es_str_t **tagname)
+{
+	struct ee_tagbucket_listnode **cookieIn;
+	struct ee_tagbucket_listnode *tag;
+	
+	cookieIn = (struct ee_tagbucket_listnode **) cookie;
+	if(*cookieIn == NULL) {
+		tag = tagbucket->root;
+	} else {
+		tag = (*cookieIn)->next;
+	}
+
+	if(tag != NULL) {
+		*tagname = tag->name;
+	}
+	*cookie = tag;
+
+	return 0; /* right now, no errors can occur (but may in the future!) */
 }
 
 

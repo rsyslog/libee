@@ -185,13 +185,26 @@ int ee_getEventFieldAsString(struct ee_event *event,
  * @memberof ee_event
  * @public
  *
- * @param event event to look at
+ * @param[in] event event to look at
  * @param[in] str name of tag
  *
  * @return	0 if event is not classified with the tag, something
  * 		else otherwise
  */
 int ee_EventHasTag(struct ee_event *event, es_str_t *tagname);
+
+
+/**
+ * Obtain the event's tagbucket.
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param[in] event event to process
+ * @param[out] tagbucket associated tagbucket. May be NULL if none is
+ *                       associated.
+ */
+void ee_EventGetTagbucket(struct ee_event *event, struct ee_tagbucket **tagbucket);
 
 
 /**
