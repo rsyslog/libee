@@ -2,7 +2,7 @@
  * @file field.c
  * Implements field object methods.
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -143,6 +143,21 @@ ee_addValueToField(struct ee_field *field, struct ee_value *val)
 		}
 	}
 	r = 0;
+done:
+	return r;
+}
+
+
+int
+ee_addStrValueToField(struct ee_field *field, es_str_t *str)
+{
+	int r;
+	struct ee_value *value;
+	assert(field != NULL);assert(field->objID== ObjID_FIELD);
+
+	CHKN(value = ee_newValue(field->ctx));
+	CHKR(ee_setStrValue(value, str));
+	r = ee_addValueToField(field, value);
 done:
 	return r;
 }

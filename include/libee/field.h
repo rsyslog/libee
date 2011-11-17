@@ -130,6 +130,23 @@ int ee_nameField(struct ee_field *field, es_str_t *name);
  */
 int ee_addValueToField(struct ee_field *field, struct ee_value *val);
 
+
+/**
+ * Add a string value to a field.
+ * This is primarily a shortcut to add a string value. For more
+ * details, see ee_addValueToField() doc, which also applies here.
+ *
+ * @memberof ee_field
+ * @public
+ *
+ * @param[in] field field to update
+ * @param[in] str string to add
+ *
+ * @return 0 on success, something else otherwise
+ */
+int ee_addStrValueToField(struct ee_field *field, es_str_t *str);
+
+
 /**
  * Encode the current field with all its values in syslog format
  * and append this representation to the provided string.

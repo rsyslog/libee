@@ -4,6 +4,8 @@ Version 0.3.2 (rgerhards), 2011-04-??
   * added capability to enumerate tags inside a tagbucket
   * added capability to obtain tagbucket for an event
     --> ee_EventGetTagbucket()
+  * added capability to add a string value to a field in one call
+    --> ee_addStrValueToField()
 - added additional parser
   * RFC5424Date
 - potentially problematic API change: in earlier versions, the 
