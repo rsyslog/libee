@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
-Version 0.3.2 (rgerhards), 2011-04-??
+Version 0.3.2 (rgerhards), 2011-11-22
 - API enhancements:
   * added capability to enumerate tags inside a tagbucket
   * added capability to obtain tagbucket for an event
