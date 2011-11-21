@@ -200,27 +200,31 @@ ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
 	struct ee_fieldbucket_listnode *node;
+	int bNeedComma = 0;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
 
 	es_addChar(str, '{');
-	if(event->tags != NULL) {
+	if(   event->ctx->flags & EE_CTX_FLAG_INCLUDE_FLAT_TAGS
+	   && event->tags != NULL) {
 		CHKR(ee_addTags_JSON(event->tags, str));
+		bNeedComma = 1;
 	}
 	if(event->fields != NULL) {
-		if(event->tags != NULL) 
-			CHKR(es_addBuf(str, ", ", 2));
 		for(node = event->fields->root ; node != NULL ; node = node->next) {
 			assert(node->field->objID == ObjID_FIELD);
+			if(bNeedComma) {
+				CHKR(es_addBuf(str, ", ", 2));
+			} else {
+				bNeedComma = 1;
+			}
 #ifdef NO_EMPTY_FIELDS
 			if(ee_addField_JSON(node->field, str) == 1)
 				continue;
 #else
 			ee_addField_JSON(node->field, str);
 #endif
-			if(node->next != NULL)
-				es_addBuf(str, ", ", ee_ctxIsEncUltraCompact(event->ctx) ? 1 : 2);
 		}
 	}
 	es_addChar(str, '}');

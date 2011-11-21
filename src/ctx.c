@@ -72,6 +72,16 @@ done:
 	return r;
 }
 
+void
+ee_setFlags(ee_ctx ctx, unsigned int flags)
+{
+	ctx->flags |= flags;
+}
+
+unsigned int ee_getFlags(ee_ctx ctx)
+{
+	return ctx->flags;
+}
 
 int
 ee_setDebugCB(ee_ctx ctx, void (*cb)(void*, char*, size_t), void *cookie)

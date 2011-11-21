@@ -9,7 +9,7 @@
  *//*
  *
  * Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -63,6 +63,7 @@ enum ee_compLevel {
 };
 
 #define EE_CTX_FLAG_ENC_ULTRACOMPACT 1
+#define EE_CTX_FLAG_INCLUDE_FLAT_TAGS 2
 
 struct ee_ctx_s {
 	unsigned objID;	/**< a magic number to prevent some memory adressing errors */
@@ -126,6 +127,34 @@ ee_ctx ee_initCtx(void);
  * @return Returns zero on success, something else otherwise.
  */
 int ee_exitCtx(ee_ctx ctx);
+
+/**
+ * Set context flags.
+ * Note that all previsouly set flags are overridden when this
+ * method is called. If that is not desired, call ee_getFlags()
+ * first and manipulate the result as desired.
+ *
+ * @memberof ee_ctx
+ * @public
+ *
+ * @param ctx The context to be updated
+ * @param flags Flags to be set. Note that currently an integer is
+ * 		passed in, but we operate with short internally.
+ */
+void ee_setFlags(ee_ctx ctx, unsigned int flags);
+
+/**
+ * Get context flags.
+ *
+ * @memberof ee_ctx
+ * @public
+ *
+ * @param ctx The context to query
+ * @return currently set flags
+ *
+ */
+unsigned int ee_getFlags(ee_ctx ctx);
+
 
 /**
  * Set encoding mode to ultra compact.

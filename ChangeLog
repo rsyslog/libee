@@ -6,6 +6,7 @@ Version 0.3.2 (rgerhards), 2011-04-??
     --> ee_EventGetTagbucket()
   * added capability to add a string value to a field in one call
     --> ee_addStrValueToField()
+  * added ee_getTag(), ee_setTags()
 - added additional parser
   * RFC5424Date
 - potentially problematic API change: in earlier versions, the 
@@ -15,6 +16,9 @@ Version 0.3.2 (rgerhards), 2011-04-??
   AND know that potentially no current user has ever used this
   function, but instead the upper-layer equivalents. But if thinks
   break, you now know why ;)
+- flat tags are no longer encoded in the CEE encoders as CEE does not
+  support flat tags. However, this can be turned on via context flags,
+  if desired
 - bugfix: compile problems under Solaris
   closes: http://bugzilla.adiscon.com/show_bug.cgi?id=253
 - bugfix: ee_EventGetTagbucket() always returned -1 (error)

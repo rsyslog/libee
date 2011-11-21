@@ -2,7 +2,7 @@
  * @mainpage
  * Libee - An Event Expression Library inspired by CEE
  *
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2011 by Rainer Gerhards and Adiscon GmbH.
  *
  * CEE is an upcoming standard used to describe network events
  * in a number of normalized formats. It's goal is to unify they currently
