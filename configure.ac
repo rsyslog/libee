@@ -8,6 +8,10 @@ AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/ctx.c])
 AC_CONFIG_HEADER([config.h])
 
+AC_DEFINE([COL_MAX_DATA], [65535], [Max length of the data block allowed in the collection value.])
+AC_CHECK_SIZEOF([long])
+AC_CHECK_SIZEOF([long long])
+
 # Checks for programs.
 AC_PROG_CC
 AM_PROG_CC_C_O
@@ -23,6 +27,9 @@ LIBS=
 #AC_SEARCH_LIBS(clock_gettime, rt)
 #rt_libs=$LIBS
 LIBS=$save_LIBS
+
+AC_PATH_PROG([DOXYGEN], [doxygen], [false])
+AM_CONDITIONAL([HAVE_DOXYGEN], [test x$DOXYGEN != xfalse ])
 
 # We CURRENTLY do NOT need libxml, but this will change at a later stage.
 # If we need libxml, we need it for features which some may not find essential.
@@ -114,6 +121,7 @@ fi
 AC_CONFIG_FILES([Makefile \
 		libee.pc \
 		src/Makefile \
+		src/collection/Makefile \
 		include/Makefile \
 		include/libee/Makefile \
 		tests/Makefile])

@@ -1,3 +1,4 @@
+SUBDIRS = collection
 sbin_PROGRAMS = convert
 
 # Uncomment for debugging
