@@ -37,6 +37,12 @@
 #include "libee/apache.h"
 #include "libee/internal.h"
 
+/* private forward definition for decoders without headers */
+int ee_jsonDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
+              int (*cbNewEvt)(struct ee_event *event),
+	      es_str_t **errMsg);
+
+
 static ee_ctx ctx;
 static FILE *fpIn;
 static int verbose = 0;
@@ -146,7 +152,8 @@ cbGetLine(es_str_t **ln)
 		r = EE_NOMEM;
 		goto done;
 	}
-	es_unescapeStr(*ln);
+	if(decoder != f_json)
+		es_unescapeStr(*ln);
 	r = 0;
 done:
 	return r;
@@ -203,6 +210,8 @@ int main(int argc, char *argv[])
 				decoder = f_int;
 			} else if(!strcmp(optarg, "apache")) {
 				decoder = f_apache;
+			} else if(!strcmp(optarg, "json")) {
+				decoder = f_json;
 			}
 			break;
 		case 'D': /* decoder-specific format string (will be validated by decoder) */ 
@@ -227,6 +236,15 @@ int main(int argc, char *argv[])
 	switch(decoder) {
 	case f_int:
 		if((r = ee_intDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
+			cstr = es_str2cstr(errmsg, NULL);
+			snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: %s\n",
+				 r, cstr);
+			free(cstr);
+			errout(errbuf);
+		}
+		break;
+	case f_json:
+		if((r = ee_jsonDec(ctx, cbGetLine, cbNewEvt, &errmsg)) != 0) {
 			cstr = es_str2cstr(errmsg, NULL);
 			snprintf(errbuf, sizeof(errbuf), "error %d in decoding stage: %s\n",
 				 r, cstr);

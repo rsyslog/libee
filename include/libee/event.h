@@ -6,7 +6,7 @@
  *//*
  *
  * Libee - An Event Expression Library inspired by CEE
- * Copyright 2010,2011 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -51,6 +51,19 @@ struct ee_event {
  * @return new library context or NULL if an error occured
  */
 struct ee_event* ee_newEvent(ee_ctx ctx);
+
+/**
+ * Create an event from a JSON string.
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param[in] ctx associated library context
+ * @param[in] json JSON classical C-string to create event from
+ *
+ * @return new library context or NULL if an error occured
+ */
+struct ee_event* ee_newEventFromJSON(ee_ctx ctx, char *json);
 
 /**
  * Destructor for the ee_event object.

@@ -1,4 +1,7 @@
 ----------------------------------------------------------------------
+Version 0.4.0 (rgerhards), 2012-??-??
+- support for decoding json added
+----------------------------------------------------------------------
 Version 0.3.2 (rgerhards), 2011-11-22
 - API enhancements:
   * added capability to enumerate tags inside a tagbucket

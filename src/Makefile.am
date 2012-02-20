@@ -22,12 +22,14 @@ libee_la_SOURCES = \
 	ctx.c \
 	tag.c \
 	event.c \
+	json_event.c \
 	value.c \
 	tagbucket.c \
 	field.c \
 	fieldbucket.c \
 	primitivetype.c \
 	int_dec.c \
+	json_dec.c \
 	apache_dec.c \
 	syslog_enc.c \
 	json_enc.c \
