@@ -19,9 +19,9 @@ AC_PROG_LIBTOOL
 
 # Checks for libraries.
 save_LIBS=$LIBS
-LIBS=
+LIBS=-lm
 #AC_SEARCH_LIBS(clock_gettime, rt)
-#rt_libs=$LIBS
+rt_libs=$LIBS
 LIBS=$save_LIBS
 
 # We CURRENTLY do NOT need libxml, but this will change at a later stage.
@@ -70,7 +70,7 @@ AC_FUNC_MALLOC
 #AC_CHECK_FUNCS([])
 
 LIBEE_CFLAGS="-I\$(top_srcdir)/include"
-LIBEE_LIBS="\$(top_builddir)/src/libee.la"
+LIBEE_LIBS="\$(top_builddir)/src/libee.la -lm"
 AC_SUBST(LIBEE_CFLAGS)
 AC_SUBST(LIBEE_LIBS)
 

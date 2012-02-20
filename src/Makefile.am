@@ -18,6 +18,7 @@ endif
 lib_LTLIBRARIES = libee.la
 
 libee_la_SOURCES = \
+	cjson/cjson.c \
 	ctx.c \
 	tag.c \
 	event.c \
