@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([libee], [0.3.2], [rgerhards@adiscon.com])
+AC_INIT([libee], [0.4.0], [rgerhards@adiscon.com])
 AM_INIT_AUTOMAKE
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/ctx.c])
@@ -19,9 +19,9 @@ AC_PROG_LIBTOOL
 
 # Checks for libraries.
 save_LIBS=$LIBS
-LIBS=
+LIBS=-lm
 #AC_SEARCH_LIBS(clock_gettime, rt)
-#rt_libs=$LIBS
+rt_libs=$LIBS
 LIBS=$save_LIBS
 
 # We CURRENTLY do NOT need libxml, but this will change at a later stage.
@@ -70,7 +70,7 @@ AC_FUNC_MALLOC
 #AC_CHECK_FUNCS([])
 
 LIBEE_CFLAGS="-I\$(top_srcdir)/include"
-LIBEE_LIBS="\$(top_builddir)/src/libee.la"
+LIBEE_LIBS="\$(top_builddir)/src/libee.la -lm"
 AC_SUBST(LIBEE_CFLAGS)
 AC_SUBST(LIBEE_LIBS)
 
