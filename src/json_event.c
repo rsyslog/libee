@@ -38,7 +38,7 @@ callback(struct ee_fieldbucket *fields, char *name,int type,cJSON *item)
 	char *valstr = NULL;
 	es_str_t *estr;
 
-printf("callback: type %d, name %s\n", type, name);
+//printf("callback: type %d, name %s\n", type, name);
 	if(type == cJSON_Object)
 		return 1; // TODO: support!
 
@@ -53,7 +53,7 @@ printf("callback: type %d, name %s\n", type, name);
 	} else if(type == cJSON_True) {
 		valstr = "true";
 	}
-printf("callback: string value %s\n", valstr);
+//printf("callback: string value %s\n", valstr);
 	
 	estr = es_newStrFromCStr(valstr, strlen(valstr));
 	val = ee_newValue(fields->ctx);
@@ -74,7 +74,7 @@ void parse_and_callback(struct ee_fieldbucket *fields, cJSON *item, char *prefix
 	int lenprefix;
 	int bNeedFree;
 	int dorecurse;
-printf("parse_and_callback, item %p, item->string %p, prefix(%d): '%s'\n", item, item->string, strlen(prefix), prefix);
+//printf("parse_and_callback, item %p, item->string %p, prefix(%d): '%s'\n", item, item->string, strlen(prefix), prefix);
 	while (item)
 	{
 		lenprefix = strlen(prefix);
