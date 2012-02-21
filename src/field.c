@@ -89,6 +89,7 @@ ee_newFieldFromNV(ee_ctx __attribute__((unused)) ctx, char *name, struct ee_valu
 	}
 
 	field->val = val;
+	field->nVals = 1;
 
 done:
 	return field;

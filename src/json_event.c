@@ -30,24 +30,6 @@
 #include "libee/fieldbucket.h"
 #include "cjson/cjson.h"
 
-#if 0
-/* Parse text to JSON, then render back to text, and print! */
-struct cJSON* doit(char *text)
-{
-	char *out;cJSON *json;
-	
-	json=cJSON_Parse(text);
-	if (!json) {printf("Error before: [%s]\n",cJSON_GetErrorPtr());}
-	else
-	{
-		out=cJSON_Print(json);
-		printf("%s\n",out);
-		free(out);
-	}
-	return json;
-}
-#endif
-
 int
 callback(struct ee_fieldbucket *fields, char *name,int type,cJSON *item)
 {
@@ -56,6 +38,7 @@ callback(struct ee_fieldbucket *fields, char *name,int type,cJSON *item)
 	char *valstr = NULL;
 	es_str_t *estr;
 
+printf("callback: type %d, name %s\n", type, name);
 	if(type == cJSON_Object)
 		return 1; // TODO: support!
 
@@ -70,6 +53,7 @@ callback(struct ee_fieldbucket *fields, char *name,int type,cJSON *item)
 	} else if(type == cJSON_True) {
 		valstr = "true";
 	}
+printf("callback: string value %s\n", valstr);
 	
 	estr = es_newStrFromCStr(valstr, strlen(valstr));
 	val = ee_newValue(fields->ctx);
