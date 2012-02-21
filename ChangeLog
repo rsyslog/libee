@@ -1,3 +1,4 @@
+- rename convert tool to prevent name clash with ImageMagick's tool
 ----------------------------------------------------------------------
 Version 0.3.2 (rgerhards), 2011-11-22
 - API enhancements:
