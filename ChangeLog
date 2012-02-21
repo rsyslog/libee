@@ -1,6 +1,6 @@
-- rename convert tool to prevent name clash with ImageMagick's tool
 ----------------------------------------------------------------------
-Version 0.4.0 (rgerhards), 2012-??-??
+Version 0.4.0 (rgerhards), 2012-02-21
+- rename convert tool to prevent name clash with ImageMagick's tool
 - support for decoding json added
 - bugfix: ee_newFieldFromNV() did not work correctly
   value was set, but number of values were not corrected, this the

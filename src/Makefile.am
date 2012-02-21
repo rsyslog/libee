@@ -36,6 +36,9 @@ libee_la_SOURCES = \
 	csv_enc.c \
 	xml_enc.c
 
+EXTRA_DIST = \
+	cjson/cjson.h
+
 libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBESTR_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS) $(LIBESTR_LIBS)
 libee_la_LDFLAGS = -version-info 0:0:0
