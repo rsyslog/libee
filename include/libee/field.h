@@ -159,7 +159,7 @@ int ee_addStrValueToField(struct ee_field *field, es_str_t *str);
  * 		   Must have been allocated by the caller.
  * @returns 0 on success, something else otherwise
  */
-int ee_addField_Syslog(struct ee_field *value, es_str_t **str);
+//int ee_addField_Syslog(struct ee_field *value, es_str_t **str);
 
 
 /**
@@ -200,7 +200,7 @@ int ee_getNumFieldVals(struct ee_field *field);
  * @returns string representation of the n-th field value or NULL in
  * 	case of error
  */
-es_str_t* ee_getFieldValueAsStr(struct ee_field *field, unsigned short n);
+es_str_t* __attribute__((deprecated)) e_getFieldValueAsStr(struct ee_field *field, unsigned short n);
 
 /**
  * Obtain the string representaton of a field.
@@ -218,6 +218,6 @@ es_str_t* ee_getFieldValueAsStr(struct ee_field *field, unsigned short n);
  *
  * @returns 0 (EE_OK) on success, error code otherwise
  */
-int ee_getFieldAsString(struct ee_field *field, es_str_t **str);
+int __attribute__((deprecated)) ee_getFieldAsString(struct ee_field *field, es_str_t **str);
 
 #endif /* #ifndef LIBEE_FIELD_H_INCLUDED */

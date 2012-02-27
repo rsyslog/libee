@@ -6,7 +6,7 @@
  * a single file is that this makes it very straightforward to write
  * encoders for different encodings, as all is in one place.
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -32,26 +32,26 @@
 #include <stdarg.h>
 #include <assert.h>
 
+#include "collection/collection.h"
 #include "libee/libee.h"
 #include "libee/internal.h"
 
 
 int
-ee_addValue_Syslog(struct ee_value *value, es_str_t **str)
+ee_addValue_Syslog(struct collection_item *item, es_str_t **str)
 {
 	int r;
-	es_str_t *valstr;
 	unsigned char *c;
 	es_size_t i;
+	unsigned lenstr;
 
 	assert(str != NULL); assert(*str != NULL);
-	assert(value != NULL); assert(value->objID == ObjID_VALUE);
+	assert(item != NULL);
 	// TODO: support other types!
-	assert(value->valtype == ee_valtype_str);
-	valstr = value->val.str;
 
-	c = es_getBufAddr(valstr);
-	for(i = 0 ; i < es_strlen(valstr) ; ++i) {
+	c = col_get_item_data(item);
+	lenstr = col_get_item_length(item) - 1;
+	for(i = 0 ; i < lenstr ; ++i) {
 		switch(c[i]) {
 		case '\0':
 			es_addChar(str, '\\');
@@ -99,17 +99,28 @@ ee_addValue_Syslog(struct ee_value *value, es_str_t **str)
 
 
 int
-ee_addField_Syslog(struct ee_field *field, es_str_t **str)
+ee_addField_Syslog(struct collection_item *item, es_str_t **str)
 {
 	int r;
-	struct ee_valnode *valnode;
+	int colType;
+	char *propname;
+	int proplen;
 
-	assert(field != NULL);assert(field->objID== ObjID_FIELD);
 	assert(str != NULL); assert(*str != NULL);
-	CHKR(es_addStr(str, field->name));
+	colType = col_get_item_type(item);
+	if(colType != COL_TYPE_STRING) {
+		goto done;
+	}
+	propname = (char*) col_get_item_property(item, &proplen);
+	CHKR(es_addBuf(str, propname, proplen));
 	CHKR(es_addBuf(str, "=\"", 2));
+	CHKR(ee_addValue_Syslog(item, str));
+#if 0
 	if(field->nVals > 0) {
-		CHKR(ee_addValue_Syslog(field->val, str));
+		/* TODO:  we need to handle arrays, if this is something that
+		  we actually need to take care of. Remember that the CEE syslog
+		  mapping currently solely bases on JSON...
+		*/
 		if(field->nVals > 1) {
 			for(valnode = field->valroot ; valnode != NULL ; valnode = valnode->next) {
 				CHKR(es_addChar(str, ','));
@@ -117,6 +128,7 @@ ee_addField_Syslog(struct ee_field *field, es_str_t **str)
 			}
 		}
 	}
+#endif
 	CHKR(es_addChar(str, '\"'));
 	r = 0;
 
@@ -150,7 +162,9 @@ int
 ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
-	struct ee_fieldbucket_listnode *node;
+	struct collection_iterator *iterator;
+	struct collection_item *item;
+	int error;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if((*str = es_newStr(256)) == NULL) goto done;
@@ -159,13 +173,22 @@ ee_fmtEventToRFC5424(struct ee_event *event, es_str_t **str)
 	if(event->tags != NULL) {
 		CHKR(ee_addTags_Syslog(event->tags, str));
 	}
-	if(event->fields != NULL) {
-		for(node = event->fields->root ; node != NULL ; node = node->next) {
-			assert(node->field->objID == ObjID_FIELD);
-			es_addChar(str, ' ');
-			ee_addField_Syslog(node->field, str);
+
+	CHKR(col_bind_iterator(&iterator, event->data, COL_TRAVERSE_DEFAULT));
+	do {
+		error = col_iterate_collection(iterator, &item);
+		if (error) {
+			col_unbind_iterator(iterator);
+			goto done;
 		}
-	}
+		if(item == NULL)
+			break;
+		if(!strcmp(col_get_item_property(item, NULL), "[ROOT]"))
+			continue; /* quick hack to get rid of root object... */
+
+		es_addChar(str, ' ');
+		ee_addField_Syslog(item, str);
+	} while(1);
 	es_addChar(str, ']');
 
 done:

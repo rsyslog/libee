@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libee
 Description: event expression library, based on CEE ideas
 Version: @VERSION@
-Libs: -L${libdir} @rt_libs@ -lee 
+Libs: -L${libdir} @rt_libs@ -lee -leecollection
 Cflags: -I${includedir}

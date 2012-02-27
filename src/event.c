@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <libestr.h>
 
+#include "collection/collection.h"
 #include "libee/libee.h"
 #include "libee/internal.h"
 #include "libee/field.h"
@@ -50,10 +51,13 @@ ee_newEvent(ee_ctx __attribute__((unused)) ctx)
 	struct ee_event *event;
 	if((event = malloc(sizeof(struct ee_event))) == NULL)
 		goto done;
+	if(col_create_collection(&event->data, "[ROOT]", 0) != 0) {
+		free(event);
+		event = NULL;
+	}
 
 	event->objID = ObjID_EVENT;
 	event->ctx = ctx;
-	event->fields = NULL;
 	event->tags = NULL;
 
 done:
@@ -67,8 +71,8 @@ ee_deleteEvent(struct ee_event *event)
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if(event->tags != NULL)
 		ee_deleteTagbucket(event->tags);
-	if(event->fields != NULL)
-		ee_deleteFieldbucket(event->fields);
+	if(event->data != NULL)
+		col_destroy_collection(event->data);
 	free(event);
 }
 
@@ -113,6 +117,7 @@ done:
 int
 ee_addFieldToEvent(struct ee_event *event, struct ee_field *field)
 {
+#if 0
 	int r;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
@@ -124,6 +129,7 @@ ee_addFieldToEvent(struct ee_event *event, struct ee_field *field)
 	
 done:
 	return r;
+#endif
 }
 
 
@@ -131,8 +137,7 @@ int
 ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 {
 	int r = -1;
-	struct ee_field *field = NULL;
-	struct ee_value *val = NULL;
+	char *cstr = NULL;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
 	if(event->fields == NULL)
@@ -140,20 +145,14 @@ ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 			goto done;
 //printf("addStrField: %s/%s\n", fieldname, es_str2cstr(value, NULL));
 
-	if((val = ee_newValue(event->ctx)) == NULL) goto done;
-	if((r = ee_setStrValue(val, value)) != 0) goto done;
-	if((field = ee_newFieldFromNV(event->ctx, fieldname, val)) == NULL) goto done;
-	if((r = ee_addFieldToBucket(event->fields, field)) != 0) goto done;
+	cstr = es_str2cstr(value, NULL);
+	if(col_add_str_property(event->data, NULL, fieldname, cstr, 0) != 0)
+		goto done;
+	r = 0;
 
 done:
-	if(r != 0) {
-		/* central error cleanup */
-		if(val != NULL)
-			ee_deleteValue(val);
-		if(field != NULL)
-			ee_deleteField(field);
-	}
-
+	if(cstr != NULL)
+		free(cstr);
 	return r;
 }
 
@@ -172,7 +171,8 @@ ee_EventHasTag(struct ee_event *event, es_str_t *tagname)
 struct ee_field*
 ee_getEventField(struct ee_event *event, es_str_t *name)
 {
-	return(ee_getBucketField(event->fields, name));
+#warning need to implement?
+	return NULL; //return(ee_getBucketField(event->fields, name));
 }
 
 

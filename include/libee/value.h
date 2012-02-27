@@ -105,7 +105,7 @@ int ee_setStrValue(struct ee_value *value, es_str_t *val);
  * 		   Must have been allocated by the caller.
  * @returns 0 on success, something else otherwise
  */
-int ee_addValue_Syslog(struct ee_value *value, es_str_t **str);
+//int ee_addValue_Syslog(struct ee_value *value, es_str_t **str);
 
 
 /**

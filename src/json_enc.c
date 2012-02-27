@@ -9,7 +9,7 @@
  * encoders for different encodings, as all is in one place.
  *
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -35,6 +35,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
+#include "collection/collection.h"
 #include "libee/libee.h"
 #include "libee/internal.h"
 
@@ -50,25 +51,22 @@ static char hexdigit[16] =
  * rgerhards, 2010-11-09
  */
 int
-ee_addValue_JSON(struct ee_value *value, es_str_t **str)
+ee_addValue_JSON(struct collection_item *item, es_str_t **str)
 {
 	int r;
-	es_str_t *valstr;
 	unsigned char *buf;
 	unsigned char c;
 	es_size_t i;
 	char numbuf[4];
 	int j;
+	unsigned lenstr;
 
 	assert(str != NULL); assert(*str != NULL);
-	assert(value != NULL); assert(value->objID == ObjID_VALUE);
-	// TODO: support other types!
-	assert(value->valtype == ee_valtype_str);
-	valstr = value->val.str;
 	es_addChar(str, '\"');
 
-	buf = es_getBufAddr(valstr);
-	for(i = 0 ; i < es_strlen(valstr) ; ++i) {
+	buf = col_get_item_data(item);
+	lenstr = col_get_item_length(item) - 1;
+	for(i = 0 ; i < lenstr ; ++i) {
 		c = buf[i];
 		if(   (c >= 0x23 && c <= 0x5b)
 		   || (c >= 0x5d /* && c <= 0x10FFFF*/)
@@ -125,37 +123,41 @@ ee_addValue_JSON(struct ee_value *value, es_str_t **str)
 
 
 int
-ee_addField_JSON(struct ee_field *field, es_str_t **str)
+ee_addField_JSON(struct collection_item *item, es_str_t **str)
 {
 	int r;
-	struct ee_valnode *valnode;
+	int colType;
+	char *propname;
+	int proplen;
 
-	assert(field != NULL);assert(field->objID== ObjID_FIELD);
 	assert(str != NULL); assert(*str != NULL);
+	colType = col_get_item_type(item);
 #ifdef NO_EMPTY_FIELDS
-if(field->nVals == 0) {
-	r = 1;
-	goto done;
-} else if(field->nVals == 1 && es_strlen(field->val->val.str) == 0) {
+if(colType != COL_TYPE_STRING) {
 	r = 1;
 	goto done;
 }
 #endif
 	CHKR(es_addChar(str, '\"'));
-	CHKR(es_addStr(str, field->name));
-	if(ee_ctxIsEncUltraCompact(field->ctx)) {
+	propname = (char*) col_get_item_property(item, &proplen);
+	CHKR(es_addBuf(str, propname, proplen));
+	if(1) { //ee_ctxIsEncUltraCompact(field->ctx)) {
 		CHKR(es_addBuf(str, "\":", 2));
 	} else {
 		CHKR(es_addBuf(str, "\": ", 3));
 	}
-	if(field->nVals == 0) {
-		if(ee_ctxIsEncUltraCompact(field->ctx)) {
+	if(colType != COL_TYPE_STRING) {
+		if(1) {//ee_ctxIsEncUltraCompact(field->ctx)) {
 			CHKR(es_addChar(str, '\"'));
 		} else {
 			CHKR(es_addBuf(str, "\"\"", 2));
 		}
+	} else {
+		CHKR(ee_addValue_JSON(item, str));
+		
+#if 0
 	} else if(field->nVals == 1) {
-		CHKR(ee_addValue_JSON(field->val, str));
+		CHKR(ee_addValue_JSON(item, str));
 	} else { /* we have multiple values --> array */
 		CHKR(es_addChar(str, '['));
 		CHKR(ee_addValue_JSON(field->val, str));
@@ -164,6 +166,7 @@ if(field->nVals == 0) {
 			CHKR(ee_addValue_JSON(valnode->val, str));
 		}
 		CHKR(es_addChar(str, ']'));
+#endif
 	}
 	r = 0;
 
@@ -199,7 +202,9 @@ int
 ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 {
 	int r = -1;
-	struct ee_fieldbucket_listnode *node;
+	int error;
+	struct collection_iterator *iterator;
+	struct collection_item *item;
 	int bNeedComma = 0;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
@@ -211,22 +216,30 @@ ee_fmtEventToJSON(struct ee_event *event, es_str_t **str)
 		CHKR(ee_addTags_JSON(event->tags, str));
 		bNeedComma = 1;
 	}
-	if(event->fields != NULL) {
-		for(node = event->fields->root ; node != NULL ; node = node->next) {
-			assert(node->field->objID == ObjID_FIELD);
-			if(bNeedComma) {
-				CHKR(es_addBuf(str, ", ", 2));
-			} else {
-				bNeedComma = 1;
-			}
-#ifdef NO_EMPTY_FIELDS
-			if(ee_addField_JSON(node->field, str) == 1)
-				continue;
-#else
-			ee_addField_JSON(node->field, str);
-#endif
+	CHKR(col_bind_iterator(&iterator, event->data, COL_TRAVERSE_DEFAULT));
+	do {
+		error = col_iterate_collection(iterator, &item);
+		if (error) {
+			col_unbind_iterator(iterator);
+			goto done;
 		}
-	}
+		if(item == NULL)
+			break;
+		if(!strcmp(col_get_item_property(item, NULL), "[ROOT]"))
+			continue; /* quick hack to get rid of root object... */
+
+		if(bNeedComma) {
+			CHKR(es_addBuf(str, ", ", 2));
+		} else {
+			bNeedComma = 1;
+		}
+#ifdef NO_EMPTY_FIELDS
+		if(ee_addField_JSON(item, str) == 1)
+			continue;
+#else
+		ee_addField_JSON(item, str);
+#endif
+	} while(1);
 	es_addChar(str, '}');
 
 done:

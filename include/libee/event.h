@@ -6,7 +6,7 @@
  *//*
  *
  * Libee - An Event Expression Library inspired by CEE
- * Copyright 2010,2011 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -37,7 +37,8 @@ struct ee_event {
 	unsigned objID;		/**< a magic number to prevent some memory adressing errors */
 	ee_ctx	ctx;			/**< the library context */
 	struct ee_tagbucket *tags;		/**< tags associated with this event */
-	struct ee_fieldbucket *fields;	/**< fields contained in this event */
+	struct ee_fieldbucket __attribute__((deprecated)) *fields;	/**< fields contained in this event */
+	struct collection_item *data;	/**< structured data contained in this event */
 };
 
 /**
@@ -51,6 +52,19 @@ struct ee_event {
  * @return new library context or NULL if an error occured
  */
 struct ee_event* ee_newEvent(ee_ctx ctx);
+
+/**
+ * Create an event from a JSON string.
+ *
+ * @memberof ee_event
+ * @public
+ *
+ * @param[in] ctx associated library context
+ * @param[in] json JSON classical C-string to create event from
+ *
+ * @return new library context or NULL if an error occured
+ */
+struct ee_event* ee_newEventFromJSON(ee_ctx ctx, char *json);
 
 /**
  * Destructor for the ee_event object.
@@ -138,7 +152,7 @@ int ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *val
  *
  * @return	0 on success, something else otherwise.
  */
-int ee_addFieldToEvent(struct ee_event *event, struct ee_field *field);
+int __attribute__((deprecated)) ee_addFieldToEvent(struct ee_event *event, struct ee_field *field);
 
 
 /**
@@ -153,7 +167,7 @@ int ee_addFieldToEvent(struct ee_event *event, struct ee_field *field);
  * @return	NULL if field was not found (or an error occured);
  *              pointer to the field otherwise
  */
-struct ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
+struct __attribute__((deprecated)) ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
 
 
 /**
@@ -175,7 +189,7 @@ struct ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
  * 		field could not be found and something else for other
  * 		errors.
  */
-int ee_getEventFieldAsString(struct ee_event *event,
+int __attribute__((deprecated)) ee_getEventFieldAsString(struct ee_event *event,
 		es_str_t *name, es_str_t **strVal);
 
 

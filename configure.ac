@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([libee], [0.4.1], [rgerhards@adiscon.com])
+AC_INIT([libee], [0.4.2], [rgerhards@adiscon.com])
 AM_INIT_AUTOMAKE
-AM_SILENT_RULES([yes])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_SRCDIR([src/ctx.c])
 AC_CONFIG_HEADER([config.h])
 
@@ -23,9 +23,9 @@ AC_PROG_LIBTOOL
 
 # Checks for libraries.
 save_LIBS=$LIBS
-LIBS=
+LIBS=-lm
 #AC_SEARCH_LIBS(clock_gettime, rt)
-#rt_libs=$LIBS
+rt_libs=$LIBS
 LIBS=$save_LIBS
 
 AC_PATH_PROG([DOXYGEN], [doxygen], [false])
@@ -77,7 +77,7 @@ AC_FUNC_MALLOC
 #AC_CHECK_FUNCS([])
 
 LIBEE_CFLAGS="-I\$(top_srcdir)/include"
-LIBEE_LIBS="\$(top_builddir)/src/libee.la"
+LIBEE_LIBS="\$(top_builddir)/src/libee.la -lm"
 AC_SUBST(LIBEE_CFLAGS)
 AC_SUBST(LIBEE_LIBS)
 
@@ -121,7 +121,6 @@ fi
 AC_CONFIG_FILES([Makefile \
 		libee.pc \
 		src/Makefile \
-		src/collection/Makefile \
 		include/Makefile \
 		include/libee/Makefile \
 		tests/Makefile])

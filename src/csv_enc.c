@@ -12,7 +12,7 @@
  * encoders for different encodings, as all is in one place.
  *
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *

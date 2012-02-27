@@ -1,8 +1,8 @@
 /**
- * @file int_dec.c
- * Decoder for libee internal event format.
+ * @file json_dec.c
+ * Decoder for JSON format.
  *//* Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -28,109 +28,48 @@
 #include <stdarg.h>
 #include <assert.h>
 
-#include "libestr.h"
 #include "libee/libee.h"
-#include "libee/int.h"
 #include "libee/internal.h"
 
 
 /**
- * Decode a line into type and value. Value is NOT unescaped.
- * @memberof ee_int
+ * Process a log line.
  * @private
  * @returns 0 on success, something else otherwise.
  */
 static inline int
-decodeLn(es_str_t *ln, char *typ, es_str_t **value)
-{
-	int r ;
-
-	if(es_strlen(ln) < 2) {
-		r = EE_INVLDFMT;
-		goto done;
-	}
-
-	*typ = es_getBufAddr(ln)[0];
-	if(*typ != '#' && *typ != 'e' && *typ != 'f' && *typ != 'v') {
-		r = EE_INVLDFMT;
-		goto done;
-	}
-
-	if(es_getBufAddr(ln)[1] != ':') {
-		r = EE_INVLDFMT;
-		goto done;
-	}
-	if((*value = es_newStrFromSubStr(ln, 2, es_strlen(ln) - 2)) == NULL) {
-		r = EE_NOMEM;
-		goto done;
-	}
-	r = 0;
-done:
-	return r;
-}
-
-
-/**
- * Process a decoded line.
- * @memberof ee_int
- * @private
- * @returns 0 on success, something else otherwise.
- */
-static inline int
-processLn(ee_ctx ctx, char typ, es_str_t *value, struct ee_event **event,
-          int (*cbNewEvt)(struct ee_event *event))
+processLn(ee_ctx ctx, es_str_t *ln,
+	  int (*cbNewEvt)(struct ee_event *event))
 {
 	int r;
-	char *namestr = NULL;
+	struct ee_event *event;
+	char *str;
 
-	switch(typ) {
-	case '#':
-		/* comment - ignore */
-		break;
-	case 'e':
-		if(*event != NULL) {
-			CHKR(cbNewEvt(*event));
-		}
-		CHKN(*event = ee_newEvent(ctx));
-		break;
-	case 'f':
-		namestr = es_str2cstr(value, NULL);
-		break;
-	case 'v':
-		CHKR(ee_addStrFieldToEvent(*event, namestr, value));
-		break;
-	}
+	str = es_str2cstr(ln, NULL);
+	CHKN(event = ee_newEventFromJSON(ctx, str));
+	free(str);
+	CHKR(cbNewEvt(event));
 	r = 0;
 
-done:
-	return r;
+done:	return r;
 }
 
 
 int
-ee_intDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
+ee_jsonDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
           int (*cbNewEvt)(struct ee_event *event),
 	      es_str_t **errMsg)
 {
 	int r;
 	int lnNbr;
 	es_str_t *ln = NULL;
-	char typ;
-	es_str_t *value;
-	struct ee_event *event = NULL;
 	char errMsgBuf[1024];
 	size_t errlen;
 	
 	lnNbr = 1;
 	r = cbGetLine(&ln);
 	while(r == 0) {
-		if((r = decodeLn(ln, &typ, &value)) != 0) {
-			errlen = snprintf(errMsgBuf, sizeof(errMsgBuf),
-					  "invalid format in line %d", lnNbr);
-			*errMsg = es_newStrFromCStr(errMsgBuf, errlen);
-			goto done;
-		}
-		if((r = processLn(ctx, typ, value, &event, cbNewEvt)) != 0) {
+		if((r = processLn(ctx, ln, cbNewEvt)) != 0) {
 			errlen = snprintf(errMsgBuf, sizeof(errMsgBuf),
 					  "error processing line %d", lnNbr);
 			*errMsg = es_newStrFromCStr(errMsgBuf, errlen);
@@ -143,9 +82,6 @@ ee_intDec(ee_ctx ctx, int (*cbGetLine)(es_str_t **ln),
 	/* when we are done with the file, we need to check if there are
 	 * any objects to submit (usually there are!)
 	 */
-	if(event != NULL) {
-		CHKR(cbNewEvt(event));
-	}
 
 	if(r == EE_EOF)
 		r = 0;

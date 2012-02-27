@@ -1,4 +1,14 @@
 ----------------------------------------------------------------------
+Version 0.4.2 (rgerhards), 2012-02-21
+- changed to utilize libcollection for internal representation
+----------------------------------------------------------------------
+Version 0.4.0 (rgerhards), 2012-02-21
+- rename convert tool to prevent name clash with ImageMagick's tool
+- support for decoding json added
+- bugfix: ee_newFieldFromNV() did not work correctly
+  value was set, but number of values were not corrected, this the
+  value could not be used (looked like non-present)
+----------------------------------------------------------------------
 Version 0.3.2 (rgerhards), 2011-11-22
 - API enhancements:
   * added capability to enumerate tags inside a tagbucket

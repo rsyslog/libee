@@ -122,15 +122,14 @@ done:	return r;
 }
 
 static inline int
-addField(ee_ctx ctx, struct ee_event *event, es_str_t *name, struct ee_value *value)
+addField(struct ee_event *event, es_str_t *name, es_str_t *value)
 {
 	int r;
-	struct ee_field *field;
+	char *nam;
 
-	CHKN(field = ee_newField(ctx));
-	CHKR(ee_nameField(field, name));
-	CHKR(ee_addValueToField(field, value));
-	CHKR(ee_addFieldToEvent(event, field));
+	nam = es_str2cstr(name, NULL);
+	CHKR(ee_addStrFieldToEvent(event, nam, value));
+	free(nam);
 	r = 0;
 
 done:	return r;
@@ -138,7 +137,7 @@ done:	return r;
 
 
 static inline int
-processField(ee_ctx ctx, es_str_t *str, es_size_t *offs, struct ee_value **value)
+processField(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t **value)
 {
 	int r;
 	int quoted;
@@ -148,7 +147,6 @@ processField(ee_ctx ctx, es_str_t *str, es_size_t *offs, struct ee_value **value
 
 	CHKN(val = es_newStr(16));
 	c = es_getBufAddr(str);
-	CHKN(*value = ee_newValue(ctx));
 	/* skip leading whitespace */
 	while(i < es_strlen(str) && c[i] == ' ') {
 		++i;
@@ -180,7 +178,7 @@ processField(ee_ctx ctx, es_str_t *str, es_size_t *offs, struct ee_value **value
 	if(!es_strconstcmp(val, "-"))
 		es_emptyStr(val);
 
-	ee_setStrValue(*value, val);
+	*value = val;
 	*offs = i;
 	r = 0;
 
@@ -198,11 +196,10 @@ static inline int
 processLn(ee_ctx ctx, struct ee_apache *apache, es_str_t *ln,
 	  int (*cbNewEvt)(struct ee_event *event))
 {
-	int r;
+	int r = 0;
 	es_size_t i;
-	struct ee_value *val;
+	es_str_t *val = NULL;
 	ee_fieldListApache_t *node;
-	struct ee_value *value;
 	struct ee_event *event;
 
 	CHKN(event = ee_newEvent(ctx));
@@ -210,7 +207,7 @@ processLn(ee_ctx ctx, struct ee_apache *apache, es_str_t *ln,
 	node = apache->nroot;
 	while(node != NULL && i < es_strlen(ln)) {
 		CHKR(processField(ctx, ln, &i, &val));
-		CHKR(addField(ctx, event, node->name, val));
+		CHKR(addField(event, node->name, val));
 		node = node->next;
 	}
 	CHKR(cbNewEvt(event));
