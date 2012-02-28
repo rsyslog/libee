@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
+#include "collection/collection.h"
 #include "libee/libee.h"
 #include "libee/internal.h"
 
@@ -40,6 +41,7 @@
 	}
 
 
+#if 0
 struct ee_fieldbucket*
 ee_newFieldbucket(ee_ctx ctx)
 {
@@ -70,6 +72,7 @@ ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket)
 	}
 	free(fieldbucket);
 }
+#endif
 
 
 /* TODO: when in validating mode, check duplicate field entries */
@@ -106,12 +109,17 @@ done:	return r;
 struct ee_field*
 ee_getBucketField(struct ee_fieldbucket *bucket, es_str_t *name)
 {
-	struct ee_fieldbucket_listnode *node;
+	int err;
+	char *propname;
+	struct collection_item *item;
 
-	for(node = bucket->root ; node != NULL ; node = node->next) {
-		if(!es_strcmp(name, node->field->name))
-			break;
-	}
+	propname = es_str2cstr(name, NULL);
+	err = col_get_item((struct collection_item *)bucket, propname,
+			COL_TYPE_STRING, COL_TRAVERSE_DEFAULT, &item);
+	free(propname);
 
-	return((node == NULL) ? NULL : node->field);
+	if(err != 0)
+		return NULL;
+
+	return((struct ee_field*) item);
 }

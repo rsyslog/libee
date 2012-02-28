@@ -6,7 +6,7 @@
  *//*
  *
  * Libee - An Event Expression Library inspired by CEE
- * Copyright 2010 by Rainer Gerhards and Adiscon GmbH.
+ * Copyright 2010-2012 by Rainer Gerhards and Adiscon GmbH.
  *
  * This file is part of libee.
  *
@@ -55,6 +55,7 @@ struct ee_fieldbucket {
 	struct ee_fieldbucket_listnode *tail; /**< list tail to speed up adding nodes */
 };
 
+#if 0
 /**
  * Constructor for the ee_fieldbucket object.
  *
@@ -92,6 +93,7 @@ void ee_deleteFieldbucket(struct ee_fieldbucket *fieldbucket);
  * @return 0 on success, something else otherwise
  */
 int ee_addFieldToBucket(struct ee_fieldbucket *fieldbucket, struct ee_field *field);
+#endif
 
 
 /**

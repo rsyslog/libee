@@ -167,7 +167,7 @@ int __attribute__((deprecated)) ee_addFieldToEvent(struct ee_event *event, struc
  * @return	NULL if field was not found (or an error occured);
  *              pointer to the field otherwise
  */
-struct __attribute__((deprecated)) ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
+struct ee_field* ee_getEventField(struct ee_event *event, es_str_t *name);
 
 
 /**

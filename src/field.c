@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
+#include "collection/collection.h"
 #include "libee/libee.h"
 #include "libee/internal.h"
 
@@ -39,6 +40,7 @@
 		goto done; \
 	}
 
+#if 0
 struct ee_field*
 ee_newField(ee_ctx ctx)
 {
@@ -194,6 +196,7 @@ ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
 done:
 	return str;
 }
+#endif
 
 
 /* TODO: this function currently assumes that the field has a string
@@ -205,23 +208,20 @@ int
 ee_getFieldAsString(struct ee_field *field, es_str_t **str)
 {
 	int r = EE_ERR;
-	struct ee_valnode *node;
+	struct collection_item *item;
+
 	assert(field != NULL);
+	item = (struct collection_item*) field;
 
 	if(*str == NULL) {
 		CHKN(*str = es_newStr(16));
 	}
 
-	if(field->nVals == 0) {
+	if(col_get_item_type(item) != COL_TYPE_STRING) {
 		goto done;
 	}
-	/* first value needs to be treated seperately */
-	CHKR(es_addStr(str, field->val->val.str));
-
-	/* on to the rest */
-	for(node = field->valroot ; node != NULL ; node = node->next) {
-		CHKR(es_addStr(str, node->val->val.str));
-	}
+	// TODO: how to handle arrays (and maybe even sub-collections)?
+	CHKR(es_addBuf(str, col_get_item_data(item), col_get_item_length(item)-1));
 
 done:	return r;
 }

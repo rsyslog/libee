@@ -108,7 +108,7 @@ hParseInt(unsigned char **buf, es_size_t *lenBuf)
  */
 #define BEGINParser(ParserName) \
 int ee_parse##ParserName(ee_ctx __attribute__((unused)) ctx, es_str_t *str, es_size_t *offs, \
-                      __attribute__((unused)) es_str_t *ed, struct ee_value **value) \
+                      __attribute__((unused)) es_str_t *ed, es_str_t **value) \
 { \
 	es_size_t r = EE_WRONGPARSER;
 
@@ -226,8 +226,7 @@ BEGINParser(RFC5424Date)
 	/* we had success, so update parse pointer and caller-provided timestamp */
 	es_size_t usedLen =  orglen - len;
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
-	*value = ee_newValue(ctx);
-	ee_setStrValue(*value, valstr);
+	*value = valstr;
 	*offs += usedLen;
 	r = 0; /* parsing was successful */
 #	if 0 /* currently, we need to persist only the string format */
@@ -469,8 +468,7 @@ BEGINParser(RFC3164Date)
 	/* we had success, so update parse pointer and caller-provided timestamp */
 	es_size_t usedLen =  orglen - len;
 	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
-	*value = ee_newValue(ctx);
-	ee_setStrValue(*value, valstr);
+	*value = valstr;
 	*offs += usedLen;
 	r = 0; /* parsing was successful */
 #if 0 /* TODO: see how we represent the actual timestamp */
@@ -505,15 +503,9 @@ BEGINParser(Number)
 	if(p == es_getBufAddr(str))
 		goto fail;
 
-	if((*value = ee_newValue(ctx)) == NULL) {
-		r = EE_NOMEM;
-		goto fail;
-	}
-
 	/* success, persist */
 	es_size_t usedLen =  orglen - len;
-	es_str_t *valstr = es_newStrFromSubStr(str, *offs, usedLen);
-	ee_setStrValue(*value, valstr);
+	value = es_newStrFromSubStr(str, *offs, usedLen);
 	*offs += usedLen;
 	r = 0;
 fail:
@@ -529,7 +521,6 @@ BEGINParser(Word)
 	unsigned char *c;
 	es_size_t i;
 	es_size_t len;	/**< length of substring we finally extract */
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -547,9 +538,7 @@ BEGINParser(Word)
 
 	/* success, persist */
 	len =  i - *offs;
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs, len));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs, len));
 	*offs = i;
 	r = 0;
 
@@ -570,7 +559,6 @@ BEGINParser(CharTo)
 	unsigned char *c;
 	unsigned char cTerm;
 	es_size_t i;
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -589,9 +577,7 @@ BEGINParser(CharTo)
 	}
 
 	/* success, persist */
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs, i - *offs));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs, i - *offs));
 	*offs = i;
 	r = 0;
 
@@ -609,7 +595,6 @@ ENDParser
 BEGINParser(QuotedString)
 	unsigned char *c;
 	es_size_t i;
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -630,9 +615,7 @@ BEGINParser(QuotedString)
 	}
 
 	/* success, persist */
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs + 1, i - *offs - 1));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs + 1, i - *offs - 1));
 	*offs = i + 1; /* "eat" terminal double quote */
 
 	r = 0;
@@ -649,7 +632,6 @@ ENDParser
 BEGINParser(ISODate)
 	unsigned char *c;
 	es_size_t i;
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -686,9 +668,7 @@ BEGINParser(ISODate)
 	}
 
 	/* success, persist */
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs, 10));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs, 10));
 	*offs += 10;
 	r = 0;
 
@@ -703,7 +683,6 @@ ENDParser
 BEGINParser(Time24hr)
 	unsigned char *c;
 	es_size_t i;
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -730,9 +709,7 @@ BEGINParser(Time24hr)
 	if(!isdigit(c[i+7])) goto done;
 
 	/* success, persist */
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs, 8));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs, 8));
 	*offs += 8;
 	r = 0;
 
@@ -748,7 +725,6 @@ ENDParser
 BEGINParser(Time12hr)
 	unsigned char *c;
 	es_size_t i;
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -774,9 +750,7 @@ BEGINParser(Time12hr)
 	if(!isdigit(c[i+7])) goto done;
 
 	/* success, persist */
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs, 8));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs, 8));
 	*offs += 8;
 	r = 0;
 
@@ -821,7 +795,6 @@ done:	return r;
 BEGINParser(IPv4)
 	unsigned char *c;
 	es_size_t i;
-	es_str_t *valstr;
 
 	assert(str != NULL);
 	assert(offs != NULL);
@@ -847,9 +820,7 @@ BEGINParser(IPv4)
 	if(chkIPv4AddrByte(str, &i) != 0) goto done;
 
 	/* if we reach this point, we found a valid IP address */
-	CHKN(*value = ee_newValue(ctx));
-	CHKN(valstr = es_newStrFromSubStr(str, *offs, i - *offs));
-	ee_setStrValue(*value, valstr);
+	CHKN(*value = es_newStrFromSubStr(str, *offs, i - *offs));
 	*offs = i;
 	r = 0;
 

@@ -114,10 +114,10 @@ done:
 }
 
 
+#if 0
 int
 ee_addFieldToEvent(struct ee_event *event, struct ee_field *field)
 {
-#if 0
 	int r;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
@@ -129,8 +129,8 @@ ee_addFieldToEvent(struct ee_event *event, struct ee_field *field)
 	
 done:
 	return r;
-#endif
 }
+#endif
 
 
 int
@@ -140,9 +140,6 @@ ee_addStrFieldToEvent(struct ee_event *event, char *fieldname, es_str_t *value)
 	char *cstr = NULL;
 
 	assert(event != NULL);assert(event->objID == ObjID_EVENT);
-	if(event->fields == NULL)
-		if((event->fields = ee_newFieldbucket(event->ctx)) == NULL)
-			goto done;
 //printf("addStrField: %s/%s\n", fieldname, es_str2cstr(value, NULL));
 
 	cstr = es_str2cstr(value, NULL);
@@ -211,7 +208,7 @@ ee_getEventFieldAsString(struct ee_event *event, es_str_t *name, es_str_t **strV
 			CHKR(es_addStr(strVal, tag->name));
 		}
 	} else {
-		f = ee_getBucketField(event->fields, name);
+		f = (struct ee_field*) ee_getBucketField(event->data, name);
 		if(f == NULL) {
 			r = EE_NOTFOUND;
 			goto done;

@@ -83,56 +83,56 @@ void ee_deletePrimitiveType(struct ee_primitiveType *primitiveType);
 /** 
  * Parser for RFC5424 date.
  */
-int ee_parseRFC5424Date(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseRFC5424Date(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 /** 
  * Parser for RFC3164 date.
  */
-int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseRFC3164Date(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 /** 
  * Parser for numbers.
  */
-int ee_parseNumber(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseNumber(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 
 /** 
  * Parser for Words (SP-terminated strings).
  */
-int ee_parseWord(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseWord(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 
 /** 
  * Parse everything up to a specific character.
  */
-int ee_parseCharTo(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseCharTo(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 
 /** 
  * Parse a quoted string.
  */
-int ee_parseQuotedString(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseQuotedString(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 /** 
  * Parse an ISO date.
  */
-int ee_parseISODate(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseISODate(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 
 /** 
  * Parse a timestamp in 12hr format.
  */
-int ee_parseTime12hr(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseTime12hr(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 
 /** 
  * Parse a timestamp in 24hr format.
  */
-int ee_parseTime24hr(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseTime24hr(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 /** 
  * Parser for IPv4 addresses.
  */
-int ee_parseIPv4(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, struct ee_value **newVal);
+int ee_parseIPv4(ee_ctx ctx, es_str_t *str, es_size_t *offs, es_str_t *ed, es_str_t **newVal);
 
 #endif /* #ifndef LIBEE_PRIMITIVETYPE_H_INCLUDED */
