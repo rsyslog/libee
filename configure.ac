@@ -18,11 +18,8 @@ fi
 AC_PROG_LIBTOOL
 
 # Checks for libraries.
-save_LIBS=$LIBS
-LIBS=-lm
-#AC_SEARCH_LIBS(clock_gettime, rt)
+AC_SEARCH_LIBS(pow, m)
 rt_libs=$LIBS
-LIBS=$save_LIBS
 
 # We CURRENTLY do NOT need libxml, but this will change at a later stage.
 # If we need libxml, we need it for features which some may not find essential.

@@ -1,7 +1,6 @@
 ----------------------------------------------------------------------
 Version 0.4.1 (rgerhards), 2012-0?-??
-- added -lm to linker options, as cjson needs the math lib
-  Thanks to Champ Clark III for mentioning the problem; I missed it
+- fixed configure.ac in regard to math lib
 ----------------------------------------------------------------------
 Version 0.4.0 (rgerhards), 2012-02-21
 - rename convert tool to prevent name clash with ImageMagick's tool
