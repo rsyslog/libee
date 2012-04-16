@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([libee], [0.4.0], [rgerhards@adiscon.com])
+AC_INIT([libee], [0.4.1], [rgerhards@adiscon.com])
 AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_SRCDIR([src/ctx.c])
