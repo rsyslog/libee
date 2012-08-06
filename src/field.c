@@ -148,6 +148,39 @@ done:
 	return r;
 }
 
+/* Function replaces value at index n with new value
+ */
+int
+ee_replaceValueInField(struct ee_field *field, struct ee_value *val, unsigned int n)
+{
+	int r = 0;
+
+	struct ee_valnode *curNode;
+	unsigned int i = 1; /* current valnode number */
+
+	assert(field != NULL);assert(field->objID== ObjID_FIELD);
+	assert(val != NULL);assert(val->objID == ObjID_VALUE);
+
+	if (n >= field->nVals) {
+		r = 1;
+		goto done;
+	} else if (n == 0) {
+		ee_deleteValue(field->val);
+		field->nVals = 1;
+		field->val = val;
+	} else {
+		/* find appropriate valnode, and replace it's val */
+		for (curNode = field->valroot; i < n; i++){
+			curNode = curNode->next;
+		}
+		ee_deleteValue(curNode->val);
+		curNode->val = val;
+	}
+
+done:
+	return r;
+}
+
 
 int
 ee_addStrValueToField(struct ee_field *field, es_str_t *str)

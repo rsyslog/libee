@@ -132,6 +132,22 @@ int ee_addValueToField(struct ee_field *field, struct ee_value *val);
 
 
 /**
+ * Replace value in the field
+ * Replace value at index n with new value val.
+ *
+ * @memberof ee_field
+ * @public
+ *
+ * @param[in] field field where update occurs
+ * @param[in] val new value
+ * @param[in] n index of value to update
+ *
+ * @return 0 on success, something else otherwise
+ */
+int ee_replaceValueInField(struct ee_field *field, struct ee_value *val, unsigned int n);
+
+
+/**
  * Add a string value to a field.
  * This is primarily a shortcut to add a string value. For more
  * details, see ee_addValueToField() doc, which also applies here.
