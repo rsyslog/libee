@@ -213,6 +213,9 @@ es_str_t*
 ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
 {
 	es_str_t *str;
+	struct ee_valnode *curNode;
+	unsigned int i = 1;
+	
 	assert(field != NULL);
 
 	if(n >= field->nVals) {
@@ -222,7 +225,10 @@ ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
 	if(n == 0) {
 		str = es_strdup(field->val->val.str);
 	} else {
-		assert(0); // TODO: implement!
+		for (curNode = field->valroot; i < n; i++){
+			curNode = curNode->next;
+		}
+		str = es_strdup(curNode->val->val.str);
 	}
 done:
 	return str;
