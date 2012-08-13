@@ -69,6 +69,7 @@ ee_deleteField(struct ee_field *field)
 		while(node != NULL) {
 			nodeDel = node;
 			ee_deleteValue(nodeDel->val);
+			node = node->next;
 			free(nodeDel);
 		}
 	}
@@ -166,7 +167,6 @@ ee_replaceValueInField(struct ee_field *field, struct ee_value *val, unsigned in
 		goto done;
 	} else if (n == 0) {
 		ee_deleteValue(field->val);
-		field->nVals = 1;
 		field->val = val;
 	} else {
 		/* find appropriate valnode, and replace it's val */
