@@ -226,6 +226,10 @@ ee_getFieldValueAsStr(struct ee_field *field, unsigned short n)
 		str = es_strdup(field->val->val.str);
 	} else {
 		for (curNode = field->valroot; i < n; i++){
+			if (curNode == NULL) {
+				str = NULL;
+				goto done;
+			}
 			curNode = curNode->next;
 		}
 		str = es_strdup(curNode->val->val.str);
