@@ -39,7 +39,7 @@ callback(struct ee_fieldbucket *fields, char *name,int type,cJSON *item)
 	es_str_t *estr;
 
 //printf("callback: type %d, name %s\n", type, name);
-	if(type == cJSON_Object)
+	if(type == cJSON_Object || type == cJSON_Array)
 		return 1; // TODO: support!
 
 	if(type == cJSON_String) {
