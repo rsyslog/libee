@@ -1,4 +1,10 @@
 ----------------------------------------------------------------------
+Version 0.4.2 2012-??-??
+- API enhancement:
+  * added ee_replaceValueInField()
+  * permitted to fetch values other than value 0
+  Thanks to Milan Bartos for the patches.
+----------------------------------------------------------------------
 Version 0.4.1 (rgerhards), 2012-04-16
 - fixed configure.ac in regard to math lib
 ----------------------------------------------------------------------
