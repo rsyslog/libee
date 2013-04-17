@@ -46,5 +46,6 @@ libee_la_LDFLAGS = -version-info 0:0:0
 libee_convert_SOURCES = convert.c
 libee_convert_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBESTR_CFLAGS) $(LIBXML2_CFLAGS)
 libee_convert_LDADD = $(LIBEE_LIBS) $(LIBXML2_LIBS) $(LIBESTR_LIBS)
+libee_convert_DEPENDENCIES = libee.la
 
 include_HEADERS = 

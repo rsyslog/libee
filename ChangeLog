@@ -1,5 +1,7 @@
 ----------------------------------------------------------------------
 Version 0.4.2 2012-??-??
+- bugfix: parallel make failed
+  Thanks to Yao Zhao for the patch
 - API enhancement:
   * added ee_replaceValueInField()
   * permitted to fetch values other than value 0
