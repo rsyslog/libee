@@ -72,13 +72,18 @@ void
 ee_deleteTagbucket(struct ee_tagbucket *tagbucket)
 {
 	int currRefCount;
+	struct ee_tagbucket_listnode *node, *nextnode;
 
 	// TODO: use atomic instructions for reference counting!
 	assert(tagbucket->objID == ObjID_TAGBUCKET);
-	currRefCount = tagbucket->refCount--;
+	currRefCount = --tagbucket->refCount;
 	if(currRefCount == 0) {
 		tagbucket->objID = ObjID_DELETED;
-		// TODO: free list (memleak)
+		for(node = tagbucket->root; node != NULL; node = nextnode) {
+			nextnode = node->next;
+			es_deleteStr(node->name);
+			free(node);
+		}
 		free(tagbucket);
 	}
 }
