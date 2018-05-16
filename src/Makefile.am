@@ -41,7 +41,7 @@ EXTRA_DIST = \
 
 libee_la_CPPFLAGS = $(LIBXML2_CFLAGS) $(LIBESTR_CFLAGS) $(LIBEE_CFLAGS)
 libee_la_LIBADD = $(LIBXML2_LIBS) $(LIBESTR_LIBS)
-libee_la_LDFLAGS = -version-info 0:0:0
+libee_la_LDFLAGS = -export-symbols-regex '^ee_' -no-undefined -version-info 0:0:0
 
 libee_convert_SOURCES = convert.c
 libee_convert_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBESTR_CFLAGS) $(LIBXML2_CFLAGS)
