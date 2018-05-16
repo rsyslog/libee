@@ -1,1 +1,9 @@
-nothing yet
+libee was originally written to support the Mitre/CEE proposed event expression format.
+However, that format has undergone several changes even before the first release,
+and what libee provides has never been put into practice.
+
+Early versions of rsyslog and liblognorm used it for representing structured content.
+However, this is long gone. We do not know of any other user. So libee should be of
+no further interest and is provided here solely for historical reasons.
+
+NO FURTHER MAINTAINCE or development HAPPENS!
